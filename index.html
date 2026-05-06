@@ -43,8 +43,7 @@
 <body>
 <div class="container">
     <h1>📊 Dashboard de Tiempos de Agentes</h1>
-    <div class="sub">🎯 Jornada: 470 min (tiempo completo) | 270 min (medio tiempo) | Límites: Después llamada (0.25min/llamada) | Capacitación 30min | Cotización 15min | Retro 15min | Retro Calidad 10min</div>
-
+    
     <div class="filters">
         <div class="filter-group"><label>📆 Periodo:</label><select id="periodoSelect"><option value="dia">Día</option><option value="semana">Semana</option><option value="mes">Mes</option></select></div>
         <div class="filter-group"><label>🗓️ Seleccionar:</label><select id="valorSelect"></select></div>
@@ -86,11 +85,11 @@
     const REGLAS = {
         normal: { 
             comida: 60, bano: 15, retro: 15, capacitacion: 30, cotizacion: 15, retroCalidad: 10, 
-            jornadaMinutos: 470, despuesLlamadaPorLlamada: 0.25 
+            jornadaMinutos: 540, despuesLlamadaPorLlamada: 0.25 
         },
         especial: { 
             comida: 20, bano: 10, retro: 15, capacitacion: 30, cotizacion: 15, retroCalidad: 10,
-            jornadaMinutos: 270, despuesLlamadaPorLlamada: 0.25 
+            jornadaMinutos: 300, despuesLlamadaPorLlamada: 0.25 
         }
     };
     
