@@ -3,69 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiempos de Agentes - Dashboard</title>
+    <title>Tiempos de Agentes - Dashboard Completo</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', sans-serif; }
-        body { background: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 1800px; margin: 0 auto; }
-        h1 { text-align: center; color: #1e3a5f; margin-bottom: 5px; }
-        .sub { text-align: center; color: #4a627a; margin-bottom: 25px; font-size: 14px; }
-        .filters { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end; background: white; border-radius: 20px; padding: 20px; margin-bottom: 25px; }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; }
-        .filter-group label { font-weight: 600; color: #1e4663; }
-        select, button { padding: 8px 16px; border-radius: 40px; border: 1px solid #ccc; background: white; font-size: 14px; cursor: pointer; min-width: 180px; }
-        button { background: #1e5f8e; color: white; border: none; font-weight: bold; }
-        button:hover { background: #0f4a6f; }
-        .chart-row { display: flex; flex-wrap: wrap; gap: 25px; margin-bottom: 30px; }
-        .chart-box { flex: 1; min-width: 400px; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .chart-box h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; color: #2c3e66; border-left: 5px solid #2c7da0; padding-left: 12px; }
-        canvas { max-height: 400px; width: 100%; }
-        .tabla-wrapper { overflow-x: auto; max-height: 650px; border-radius: 12px; border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1400px; }
-        th, td { border: 1px solid #ddd; padding: 12px 8px; text-align: left; vertical-align: middle; }
-        th { background: #1e2a3a !important; color: white !important; font-weight: 700; position: sticky; top: 0; font-size: 13px; }
-        th * { color: white !important; }
-        .exceso-bueno { background: #e0f2e9; color: #0e6b3e; font-weight: bold; }
-        .falta-malo { background: #ffeeee; color: #b91c1c; font-weight: bold; }
-        .ok { background: #e8f0fe; color: #1e5f8e; }
-        footer { text-align: center; margin-top: 30px; color: #6c757d; font-size: 12px; }
-        .btn-refresh { background: #1e5f8e; color: white; border: none; padding: 8px 20px; border-radius: 40px; cursor: pointer; font-weight: bold; }
-        .btn-refresh:hover { background: #0f4a6f; }
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-        .badge-especial { background: #e6f3ff; color: #1e5f8e; }
-        .badge-normal { background: #e8f5e9; color: #2e7d32; }
-        .tiempo-numero { font-size: 14px; font-weight: 600; }
-        .small-text { font-size: 10px; color: #666; display: block; }
-        .diferencia-texto { font-size: 11px; font-weight: 500; }
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #eef2f7;
+            margin: 0;
+            padding: 28px 24px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Encabezado principal */
+        h1 {
+            text-align: center;
+            color: #1a3e50;
+            margin-bottom: 6px;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .sub {
+            text-align: center;
+            color: #4b6b8a;
+            margin-bottom: 28px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #cbdde9;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 6px;
+        }
+
+        /* Filtros mejorados */
+        .filters {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            background: white;
+            border-radius: 28px;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2edf2;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: 700;
+            color: #1e4b6e;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
+
+        select, button {
+            padding: 8px 20px;
+            border-radius: 60px;
+            border: 1px solid #cbdbe0;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            min-width: 190px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        select:hover {
+            border-color: #2c7da0;
+            background: #f9fcff;
+        }
+
+        button {
+            background: #1e5f8e;
+            color: white;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        button:hover {
+            background: #0f4a6f;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Sección de gráficos: 2 columnas */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 36px;
+        }
+
+        .card-chart {
+            background: white;
+            border-radius: 28px;
+            padding: 1.2rem 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            border: 1px solid #eef2f5;
+        }
+
+        .card-chart h3 {
+            margin-top: 0;
+            margin-bottom: 1.2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f3e53;
+            border-left: 6px solid #2c7da0;
+            padding-left: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        canvas {
+            max-height: 380px;
+            width: 100%;
+        }
+
+        /* --- SECCIÓN COMPLETA DE TABLA (ocupa todo el ancho) --- */
+        .table-full-section {
+            margin-top: 28px;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #e2edf2;
+        }
+
+        .table-header {
+            background: #f8fafd;
+            padding: 1rem 1.8rem;
+            border-bottom: 2px solid #dce5ec;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .table-header h3 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin: 0;
+            color: #1c4e6c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .table-header h3 span {
+            background: #e9f0f5;
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #2c627e;
+        }
+
+        .period-badge {
+            background: #eef2fa;
+            padding: 6px 16px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            color: #2c5a7a;
+            font-weight: 500;
+        }
+
+        .tabla-scroll {
+            overflow-x: auto;
+            max-height: 680px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 1380px;
+            font-family: 'Segoe UI', system-ui;
+        }
+
+        .data-table th {
+            background: #1f2e3f !important;
+            color: white !important;
+            font-weight: 700;
+            padding: 14px 10px;
+            font-size: 0.8rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #2f465e;
+        }
+
+        .data-table td {
+            border: 1px solid #e2e8f0;
+            padding: 10px 8px;
+            vertical-align: middle;
+            transition: background 0.1s ease;
+            text-align: center;
+        }
+
+        .data-table tr:hover td {
+            background-color: #fafcff;
+        }
+
+        .data-table td:first-child, .data-table th:first-child {
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 5;
+        }
+
+        .data-table th:first-child {
+            background: #1f2e3f !important;
+            left: 0;
+            z-index: 15;
+        }
+
+        /* Estilos de celdas */
+        .badge-tipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef2fa;
+            padding: 4px 12px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .badge-especial {
+            background: #e1f0fa;
+            color: #1c6f9c;
+        }
+
+        .badge-normal {
+            background: #e6f4ea;
+            color: #2c6e3c;
+        }
+
+        .exceso-bueno {
+            background: #dff6ed;
+            color: #0b5e3a;
+            font-weight: 600;
+        }
+
+        .falta-malo {
+            background: #ffe9e9;
+            color: #b91c1c;
+            font-weight: 600;
+        }
+
+        .ok-neutral {
+            background: #f1f5f9;
+            color: #2c5d7c;
+        }
+
+        .tiempo-numero {
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .small-note {
+            font-size: 0.65rem;
+            color: #5f7f9e;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .diff-text {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-icon {
+            font-size: 0.75rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 32px;
+            color: #7b8c9e;
+            font-size: 0.75rem;
+            border-top: 1px solid #dce5ec;
+            padding-top: 20px;
+        }
+
+        @media (max-width: 1000px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            body {
+                padding: 16px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>📊 Dashboard de Tiempos de Agentes</h1>
-    
-    <div class="filters">
-        <div class="filter-group"><label>📆 Periodo:</label><select id="periodoSelect"><option value="dia">Día</option><option value="semana">Semana</option><option value="mes">Mes</option></select></div>
-        <div class="filter-group"><label>🗓️ Seleccionar:</label><select id="valorSelect"></select></div>
-        <div class="filter-group"><label>👤 Filtrar por Agente:</label><select id="agenteSelect"><option value="TODOS">📋 Todos los agentes</option></select></div>
-        <div class="filter-group"><button id="refreshBtn" class="btn-refresh">🔄 Actualizar Dashboard</button></div>
+    <h1>📊 Tiempos de Agentes · Control & Cumplimiento</h1>
+    <div style="text-align: center;">
+        
     </div>
 
-    <div id="dashboardContent">
-        <div class="chart-row">
-            <div class="chart-box"><h3>⏱️ Tiempos por Agente (horas)</h3><canvas id="chartTiempos"></canvas></div>
-            <div class="chart-box"><h3>⚖️ Cumplimiento de Pausas (diferencia +/- minutos)</h3><canvas id="chartCumplimiento"></canvas></div>
+    <div class="filters">
+        <div class="filter-group"><label>📆 Periodo</label><select id="periodoSelect"><option value="dia">Día</option><option value="semana">Semana</option><option value="mes">Mes</option></select></div>
+        <div class="filter-group"><label>🗓️ Segmento</label><select id="valorSelect"></select></div>
+        <div class="filter-group"><label>👤 Agente</label><select id="agenteSelect"><option value="TODOS">📋 Todos los agentes</option></select></div>
+        <div class="filter-group"><button id="refreshBtn" class="btn-refresh">🔄 Actualizar dashboard</button></div>
+    </div>
+
+    <!-- Gráficos principales en grilla doble -->
+    <div class="charts-grid">
+        <div class="card-chart"><h3>⏱️ Tiempos productivos (horas)</h3><canvas id="chartTiempos"></canvas></div>
+        <div class="card-chart"><h3>⏳ Desviación de pausas (minutos)</h3><canvas id="chartCumplimiento"></canvas></div>
+        <div class="card-chart"><h3>⚠️ Excesos detectados (minutos)</h3><canvas id="chartExcesos"></canvas></div>
+        
+           
+       
+    </div>
+
+    <!-- SECCIÓN COMPLETA DE TABLA - Ocupa ancho total -->
+    <div class="table-full-section">
+        <div class="table-header">
+            <h3>📋 Resumen detallado por agente <span>comparativa vs estándar</span></h3>
+            <div class="period-badge" id="periodoInfoLabel">📅 Periodo actual</div>
         </div>
-        <div class="chart-row">
-            <div class="chart-box"><h3>⚠️ Excesos de tiempo</h3><canvas id="chartExcesos"></canvas></div>
-            <div class="chart-box"><h3>📋 Resumen por agente</h3><div class="tabla-wrapper" id="tablaResumen"></div></div>
+        <div class="tabla-scroll" id="tablaResumenWrapper">
+            <!-- La tabla se inyecta dinámicamente aquí -->
+            <div style="padding: 20px; text-align: center; color: #5f7f9e;">⚙️ Cargando información de rendimiento...</div>
         </div>
     </div>
     
 </div>
 
 <script>
-    // ===================== DATOS ACTUALIZADOS =====================
+    // ===================== DATOS (mismos registros actualizados) =====================
     const datosCompletos = [
         {Fecha:"2026-05-02", Nombre:" ADRIANA ANGELICA FLORES RAMIREZ", Llamadas:104, Total:288.1, DISPONIBLE:78.7, EN_LLAMADA:56.2, DESPUES_LLAMADA:23.1, PAUSA:15.9, PAUSECOMIDA:0.1, PAUSECOTIZACION:9.8, PAUSERETRO:17.7, PAUSEBAÑO:0, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0},
         {Fecha:"2026-05-02", Nombre:"JESUS ANGEL ZAVALA SANCHEZ", Llamadas:118, Total:299.5, DISPONIBLE:86.1, EN_LLAMADA:108.6, DESPUES_LLAMADA:34.6, PAUSA:2.5, PAUSECOMIDA:0, PAUSECOTIZACION:23, PAUSERETRO:19, PAUSEBAÑO:10.1, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0},
@@ -75,13 +370,13 @@
         {Fecha:"2026-05-02", Nombre:"ROBERTO JAIR NAVARRETE CARRILLO", Llamadas:107, Total:290.5, DISPONIBLE:86.9, EN_LLAMADA:80.4, DESPUES_LLAMADA:17.7, PAUSA:0, PAUSECOMIDA:24.7, PAUSECOTIZACION:22.8, PAUSERETRO:0, PAUSEBAÑO:6.6, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0}
     ];
 
-    // AGENTES ESPECIALES (MEDIO TIEMPO - 270 min jornada)
+    // AGENTES ESPECIALES (medio tiempo)
     const AGENTES_ESPECIALES = [
         "PAMELA VALERIA  ARELLANO MARADIAGA", "JESUS ANGEL ZAVALA SANCHEZ", "JAIME PACHECO GONZALEZ", 
         "WENDY VERONICA BAEZ MONROY", " ADRIANA ANGELICA FLORES RAMIREZ"
     ];
     
-    // REGLAS: Jornada 470 min (normal) o 270 min (especial)
+    // REGLAS actualizadas: jornada normal = 540 min (9h), especial = 300 min (5h)
     const REGLAS = {
         normal: { 
             comida: 60, bano: 15, retro: 15, capacitacion: 30, cotizacion: 15, retroCalidad: 10, 
@@ -182,7 +477,6 @@
             acc.jornadaEsperada = jornadaEsperada;
             acc.diasMultiplicador = diasMultiplicador;
             acc.tipo = tipo;
-            
             resultados.push(acc);
         }
         return resultados;
@@ -223,40 +517,35 @@
         let periodo = document.getElementById('periodoSelect').value;
         let valor = document.getElementById('valorSelect').value;
         let agenteFiltro = document.getElementById('agenteSelect').value;
-        
         if (!valor || !datosGlobales.length) return;
         
         let filtrados = procesarPeriodo(datosGlobales, periodo, valor);
-        
         if (agenteFiltro !== "TODOS") {
             filtrados = filtrados.filter(d => d.Nombre.trim() === agenteFiltro);
         }
         
         let agentes = agruparPorAgente(filtrados, periodo);
-        
         if (!agentes.length) { 
-            document.getElementById('tablaResumen').innerHTML = '<p>Sin datos en este periodo</p>'; 
+            document.getElementById('tablaResumenWrapper').innerHTML = '<div style="padding: 40px; text-align:center;">⚠️ Sin datos para el filtro seleccionado</div>'; 
             return;
         }
-        
         agentes.sort((a,b) => a.nombre.localeCompare(b.nombre));
-        
         const labels = agentes.map(a => a.nombre);
         
-        // Gráfico 1
+        // Grafico 1
         if (charts.tiempos) charts.tiempos.destroy();
         const ctxTiempos = document.getElementById('chartTiempos').getContext('2d');
         charts.tiempos = new Chart(ctxTiempos, {
             type: 'bar', 
             data: { labels, datasets: [
-                { label: 'Disponible (horas)', data: agentes.map(a=>a.disponible/60), backgroundColor: '#2c7da0' },
-                { label: 'En llamada (horas)', data: agentes.map(a=>a.enLlamada/60), backgroundColor: '#61a5c2' },
-                { label: 'Después llamada (horas)', data: agentes.map(a=>a.despues/60), backgroundColor: '#89c2d9' }
+                { label: 'Disponible (horas)', data: agentes.map(a=>a.disponible/60), backgroundColor: '#2c7da0', borderRadius: 8 },
+                { label: 'En llamada (horas)', data: agentes.map(a=>a.enLlamada/60), backgroundColor: '#61a5c2', borderRadius: 8 },
+                { label: 'Después llamada (horas)', data: agentes.map(a=>a.despues/60), backgroundColor: '#89c2d9', borderRadius: 8 }
             ] }, 
-            options: { responsive: true, maintainAspectRatio: true }
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
         });
         
-        // Gráfico 2
+        // Grafico 2 cumple
         if (charts.cumplimiento) charts.cumplimiento.destroy();
         const ctxCumplimiento = document.getElementById('chartCumplimiento').getContext('2d');
         charts.cumplimiento = new Chart(ctxCumplimiento, {
@@ -270,7 +559,7 @@
             options: { responsive: true }
         });
         
-        // Gráfico 3
+        // Gráfico 3 excesos
         let excLabels=[], excComida=[], excBano=[], excCap=[], excCot=[];
         agentes.forEach(a=>{
             if(a.diffComida>0 || a.diffBano>0 || a.diffCapacitacion>0 || a.diffCotizacion>0){
@@ -281,7 +570,6 @@
                 excCot.push(a.diffCotizacion>0 ? a.diffCotizacion : 0);
             }
         });
-        
         if (charts.excesos) charts.excesos.destroy();
         const ctxExcesos = document.getElementById('chartExcesos').getContext('2d');
         if(excLabels.length){
@@ -293,95 +581,74 @@
                     { label:'Exceso Capacitación (min)', data:excCap, backgroundColor:'#2a9d8f' },
                     { label:'Exceso Cotización (min)', data:excCot, backgroundColor:'#e76f51' }
                 ] }, 
-                options: { responsive: true }
+                options: { responsive: true, maintainAspectRatio: true }
             });
         } else {
             charts.excesos = new Chart(ctxExcesos, { type: 'bar', data: { labels: [], datasets: [] } });
             ctxExcesos.fillStyle = '#2c7da0';
             ctxExcesos.font = '14px sans-serif';
-            ctxExcesos.fillText('✅ No hay excesos de pausas en este periodo', 20, 50);
+            ctxExcesos.fillText('✅ No hay excesos de pausas en este periodo', 30, 80);
         }
         
-        // TABLA COMPLETA
-        let periodoTexto = periodo === 'dia' ? 'día' : (periodo === 'semana' ? 'semana' : 'mes');
-        let htmlTabla = `<div style="margin-bottom:15px; font-size:13px; color:#666; padding:5px;">📌 Comparado con ${agentes[0]?.diasMultiplicador || 1} días laborales (${periodoTexto})</div>
-        <table style="width:100%;">
+        // ========== TABLA COMPLETA OCUPANDO SECCIÓN GLOBAL ==========
+        let periodoTexto = periodo === 'dia' ? 'Día' : (periodo === 'semana' ? 'Semana' : 'Mes');
+        let fechaReferencia = valor;
+        document.getElementById('periodoInfoLabel').innerHTML = `📅 ${periodoTexto} · ${fechaReferencia} · ${agentes[0]?.diasMultiplicador || 1} día(s) laboral(es)`;
+        
+        let html = `<table class="data-table">
             <thead>
-                <tr>
-                    <th>Agente</th>
-                    <th>Tipo</th>
-                    <th>Llamadas</th>
-                    <th>⏰ Jornada</th>
-                    <th>⌨ Después Llamada</th>
-                    <th>✅ Disponible</th>
-                    <th>📞 En Llamada</th>
-                    <th>🍽️ Comida</th>
-                    <th>🧻 Baño</th>
-                    <th>📚 Capacitación</th>
-                    <th>💰 Cotización</th>
-                    <th>📝 Retro</th>
-                    <th>🎯 Retro Calidad</th>
-                </tr>
+                <tr><th>Agente</th><th>Tipo</th><th>📞 Llamadas</th><th>⏱️ Jornada real / esperada</th><th>⌨️ Después llamada</th>
+                 <th>✅ Disponible</th><th>📞 En llamada</th><th>🍽️ Comida</th><th>🧻 Baño</th><th>📚 Capacitación</th><th>💰 Cotización</th><th>📝 Retro</th><th>🎯 Retro Calidad</th></tr>
             </thead>
             <tbody>`;
-        
         agentes.forEach(a => {
             let tipoTexto = a.tipo === 'especial' ? '🟢 Medio tiempo' : '🔵 Tiempo completo';
             let tipoBadge = a.tipo === 'especial' ? 'badge-especial' : 'badge-normal';
             
             let jornadaClase = a.diffJornada >= 0 ? 'exceso-bueno' : 'falta-malo';
-            let jornadaTexto = a.diffJornada > 0 ? `✅ +${(a.diffJornada/60).toFixed(1)}h` : 
-                               (a.diffJornada < 0 ? `❌ ${(-a.diffJornada/60).toFixed(1)}h` : `✅ Exacto`);
+            let jornadaDiffText = a.diffJornada > 0 ? `✅ +${(a.diffJornada/60).toFixed(1)}h` : (a.diffJornada < 0 ? `❌ ${(-a.diffJornada/60).toFixed(1)}h` : `✅ Exacto`);
             
-            let despuesClase = a.diffDespues > 0 ? 'falta-malo' : (a.diffDespues < 0 ? 'exceso-bueno' : 'ok');
-            let despuesTexto = a.diffDespues > 0 ? `❌ +${a.diffDespues.toFixed(1)}` : 
-                              (a.diffDespues < 0 ? `✅ ${(-a.diffDespues).toFixed(1)}` : '✅ OK');
+            let despuesClase = a.diffDespues > 0 ? 'falta-malo' : (a.diffDespues < 0 ? 'exceso-bueno' : 'ok-neutral');
+            let despuesTexto = a.diffDespues > 0 ? `❌ +${a.diffDespues.toFixed(1)}` : (a.diffDespues < 0 ? `✅ ${(-a.diffDespues).toFixed(1)}` : '✅ OK');
             
-            let comidaClase = a.diffComida > 0 ? 'falta-malo' : (a.diffComida < 0 ? 'exceso-bueno' : 'ok');
-            let comidaTexto = a.diffComida > 0 ? `❌ +${a.diffComida.toFixed(1)}` : 
-                              (a.diffComida < 0 ? `✅ ${(-a.diffComida).toFixed(1)}` : '✅ OK');
+            let comidaClase = a.diffComida > 0 ? 'falta-malo' : (a.diffComida < 0 ? 'exceso-bueno' : 'ok-neutral');
+            let comidaTexto = a.diffComida > 0 ? `❌ +${a.diffComida.toFixed(1)}` : (a.diffComida < 0 ? `✅ ${(-a.diffComida).toFixed(1)}` : '✅ OK');
             
-            let banoClase = a.diffBano > 0 ? 'falta-malo' : (a.diffBano < 0 ? 'exceso-bueno' : 'ok');
-            let banoTexto = a.diffBano > 0 ? `❌ +${a.diffBano.toFixed(1)}` : 
-                            (a.diffBano < 0 ? `✅ ${(-a.diffBano).toFixed(1)}` : '✅ OK');
+            let banoClase = a.diffBano > 0 ? 'falta-malo' : (a.diffBano < 0 ? 'exceso-bueno' : 'ok-neutral');
+            let banoTexto = a.diffBano > 0 ? `❌ +${a.diffBano.toFixed(1)}` : (a.diffBano < 0 ? `✅ ${(-a.diffBano).toFixed(1)}` : '✅ OK');
             
-            let capClase = a.diffCapacitacion > 0 ? 'falta-malo' : (a.diffCapacitacion < 0 ? 'exceso-bueno' : 'ok');
-            let capTexto = a.diffCapacitacion > 0 ? `❌ +${a.diffCapacitacion.toFixed(1)}` : 
-                          (a.diffCapacitacion < 0 ? `✅ ${(-a.diffCapacitacion).toFixed(1)}` : '✅ OK');
+            let capClase = a.diffCapacitacion > 0 ? 'falta-malo' : (a.diffCapacitacion < 0 ? 'exceso-bueno' : 'ok-neutral');
+            let capTexto = a.diffCapacitacion > 0 ? `❌ +${a.diffCapacitacion.toFixed(1)}` : (a.diffCapacitacion < 0 ? `✅ ${(-a.diffCapacitacion).toFixed(1)}` : '✅ OK');
             
-            let cotClase = a.diffCotizacion > 0 ? 'falta-malo' : (a.diffCotizacion < 0 ? 'exceso-bueno' : 'ok');
-            let cotTexto = a.diffCotizacion > 0 ? `❌ +${a.diffCotizacion.toFixed(1)}` : 
-                          (a.diffCotizacion < 0 ? `✅ ${(-a.diffCotizacion).toFixed(1)}` : '✅ OK');
+            let cotClase = a.diffCotizacion > 0 ? 'falta-malo' : (a.diffCotizacion < 0 ? 'exceso-bueno' : 'ok-neutral');
+            let cotTexto = a.diffCotizacion > 0 ? `❌ +${a.diffCotizacion.toFixed(1)}` : (a.diffCotizacion < 0 ? `✅ ${(-a.diffCotizacion).toFixed(1)}` : '✅ OK');
             
-            let retroClase = a.diffRetro > 0 ? 'falta-malo' : (a.diffRetro < 0 ? 'exceso-bueno' : 'ok');
-            let retroTexto = a.diffRetro > 0 ? `❌ +${a.diffRetro.toFixed(1)}` : 
-                            (a.diffRetro < 0 ? `✅ ${(-a.diffRetro).toFixed(1)}` : '✅ OK');
+            let retroClase = a.diffRetro > 0 ? 'falta-malo' : (a.diffRetro < 0 ? 'exceso-bueno' : 'ok-neutral');
+            let retroTexto = a.diffRetro > 0 ? `❌ +${a.diffRetro.toFixed(1)}` : (a.diffRetro < 0 ? `✅ ${(-a.diffRetro).toFixed(1)}` : '✅ OK');
             
-            let retroCalClase = a.diffRetroCalidad > 0 ? 'falta-malo' : (a.diffRetroCalidad < 0 ? 'exceso-bueno' : 'ok');
-            let retroCalTexto = a.diffRetroCalidad > 0 ? `❌ +${a.diffRetroCalidad.toFixed(1)}` : 
-                               (a.diffRetroCalidad < 0 ? `✅ ${(-a.diffRetroCalidad).toFixed(1)}` : '✅ OK');
+            let retroCalClase = a.diffRetroCalidad > 0 ? 'falta-malo' : (a.diffRetroCalidad < 0 ? 'exceso-bueno' : 'ok-neutral');
+            let retroCalTexto = a.diffRetroCalidad > 0 ? `❌ +${a.diffRetroCalidad.toFixed(1)}` : (a.diffRetroCalidad < 0 ? `✅ ${(-a.diffRetroCalidad).toFixed(1)}` : '✅ OK');
             
-            htmlTabla += `<tr>
-                <td style="font-weight:600;">${a.nombre}</td>
-                <td><span class="badge ${tipoBadge}">${tipoTexto}</span></td>
-                <td style="text-align:center; font-weight:600;">${a.llamadas}</td>
-                <td class="${jornadaClase}" style="text-align:center;"><strong>${(a.totalConexionMinutos/60).toFixed(1)}h / ${(a.jornadaEsperada/60).toFixed(0)}h</strong><br><span class="small-text">${jornadaTexto}</span></td>
-                <td class="${despuesClase}"><small>Lim: ${a.despuesEsperado.toFixed(1)} min</small><br><strong>Real: ${a.despues.toFixed(1)} min</strong><br><span class="diferencia-texto">${despuesTexto}</span></td>
-                <td><strong>${formatearTiempo(a.disponible)}</strong><br><span class="small-text">sin tope</span></td>
-                <td><strong>${formatearTiempo(a.enLlamada)}</strong><br><span class="small-text">sin tope</span></td>
-                <td class="${comidaClase}"><small>Lim: ${a.comidaEsperada}</small><br><strong>${a.comidaTotal.toFixed(1)}</strong><br>${comidaTexto}</td>
-                <td class="${banoClase}"><small>Lim: ${a.banoEsperado}</small><br><strong>${a.banoTotal.toFixed(1)}</strong><br>${banoTexto}</td>
-                <td class="${capClase}"><small>Lim: ${a.capacitacionEsperada}</small><br><strong>${a.capacitacionTotal.toFixed(1)}</strong><br>${capTexto}</td>
-                <td class="${cotClase}"><small>Lim: ${a.cotizacionEsperada}</small><br><strong>${a.cotizacionTotal.toFixed(1)}</strong><br>${cotTexto}</td>
-                <td class="${retroClase}"><small>Lim: ${a.retroEsperado}</small><br><strong>${a.retroTotal.toFixed(1)}</strong><br>${retroTexto}</td>
-                <td class="${retroCalClase}"><small>Lim: ${a.retroCalidadEsperada}</small><br><strong>${a.retroCalidadTotal.toFixed(1)}</strong><br>${retroCalTexto}</td>
+            html += `<tr>
+                <td style="font-weight:700; text-align:left;">${a.nombre}</td>
+                <td><span class="badge-tipo ${tipoBadge}">${tipoTexto}</span></td>
+                <td><strong>${a.llamadas}</strong></td>
+                <td class="${jornadaClase}"><span class="tiempo-numero">${(a.totalConexionMinutos/60).toFixed(1)}h / ${(a.jornadaEsperada/60).toFixed(0)}h</span><br><span class="diff-text">${jornadaDiffText}</span></td>
+                <td class="${despuesClase}"><small>esperado: ${a.despuesEsperado.toFixed(1)} min</small><br><strong>real: ${a.despues.toFixed(1)} min</strong><br><span class="diff-text">${despuesTexto}</span></td>
+                <td>${formatearTiempo(a.disponible)}</td><td>${formatearTiempo(a.enLlamada)}</td>
+                <td class="${comidaClase}"><small>lim: ${a.comidaEsperada}</small><br><strong>${a.comidaTotal.toFixed(1)}</strong><br>${comidaTexto}</td>
+                <td class="${banoClase}"><small>lim: ${a.banoEsperado}</small><br><strong>${a.banoTotal.toFixed(1)}</strong><br>${banoTexto}</td>
+                <td class="${capClase}"><small>lim: ${a.capacitacionEsperada}</small><br><strong>${a.capacitacionTotal.toFixed(1)}</strong><br>${capTexto}</td>
+                <td class="${cotClase}"><small>lim: ${a.cotizacionEsperada}</small><br><strong>${a.cotizacionTotal.toFixed(1)}</strong><br>${cotTexto}</td>
+                <td class="${retroClase}"><small>lim: ${a.retroEsperado}</small><br><strong>${a.retroTotal.toFixed(1)}</strong><br>${retroTexto}</td>
+                <td class="${retroCalClase}"><small>lim: ${a.retroCalidadEsperada}</small><br><strong>${a.retroCalidadTotal.toFixed(1)}</strong><br>${retroCalTexto}</td>
             </tr>`;
         });
-        htmlTabla += `</tbody></table>`;
-        document.getElementById('tablaResumen').innerHTML = htmlTabla;
+        html += `</tbody></table>`;
+        document.getElementById('tablaResumenWrapper').innerHTML = html;
     }
     
-    // Event listeners
+    // Eventos
     const periodoSelect = document.getElementById('periodoSelect');
     const valorSelect = document.getElementById('valorSelect');
     const agenteSelect = document.getElementById('agenteSelect');
@@ -395,7 +662,6 @@
     agenteSelect.addEventListener('change', renderDashboard);
     refreshBtn.addEventListener('click', renderDashboard);
     
-    // Inicializar
     actualizarOpciones('dia');
     renderDashboard();
 </script>
