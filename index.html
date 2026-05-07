@@ -708,7 +708,7 @@
             let tipoBadge = a.tipo === 'especial' ? 'badge-especial' : 'badge-normal';
             
             let jornadaClase = a.diffJornada >= 0 ? 'exceso-bueno' : 'falta-malo';
-            let jornadaDiffText = a.diffJornada > 0 ? `✅ +${(a.diffJornada/60).toFixed(1)}h` : (a.diffJornada < 0 ? `❌ ${(a.diffJornada/60).toFixed(1)}h` : `✅ Exacto`);
+            let jornadaDiffText = a.diffJornada > 0 ? `✅ +${a.diffJornada.toFixed(0)} min` : (a.diffJornada < 0 ? `❌ ${a.diffJornada.toFixed(0)} min` : `✅ Exacto`);
             
             let deudaClase = a.deudaTotalPausas > 0 ? 'falta-malo' : 'ok-neutral';
             let deudaTexto = a.deudaTotalPausas > 0 
