@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiempos de Agentes</title>
+    <title>Tiempos de Agentes - Dashboard Administrativo</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
@@ -22,27 +22,52 @@
             margin: 0 auto;
         }
 
-        /* Encabezado principal */
         h1 {
             text-align: center;
             color: #1a3e50;
             margin-bottom: 6px;
             font-size: 2rem;
             font-weight: 600;
-            letter-spacing: -0.3px;
         }
 
-        .sub {
-            text-align: center;
+        /* Pestañas */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #cbdde9;
+            padding-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: transparent;
             color: #4b6b8a;
-            margin-bottom: 28px;
-            font-size: 0.9rem;
-            border-bottom: 1px solid #cbdde9;
-            display: inline-block;
-            width: auto;
-            margin-left: auto;
-            margin-right: auto;
-            padding-bottom: 6px;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #e2edf2;
+            transform: none;
+        }
+
+        .tab-btn.active {
+            background: #1e5f8e;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         /* Filtros mejorados */
@@ -55,7 +80,7 @@
             border-radius: 28px;
             padding: 1rem 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03);
             border: 1px solid #e2edf2;
         }
 
@@ -69,10 +94,9 @@
             font-weight: 700;
             color: #1e4b6e;
             font-size: 0.85rem;
-            letter-spacing: 0.3px;
         }
 
-        select, button {
+        select, button, input {
             padding: 8px 20px;
             border-radius: 60px;
             border: 1px solid #cbdbe0;
@@ -84,26 +108,17 @@
             transition: all 0.2s ease;
         }
 
-        select:hover {
-            border-color: #2c7da0;
-            background: #f9fcff;
-        }
-
         button {
             background: #1e5f8e;
             color: white;
             border: none;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         button:hover {
             background: #0f4a6f;
             transform: translateY(-1px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
         }
 
-        /* Sección de gráficos: 2 columnas */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -116,7 +131,6 @@
             border-radius: 28px;
             padding: 1.2rem 1.5rem;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s;
             border: 1px solid #eef2f5;
         }
 
@@ -128,9 +142,6 @@
             color: #1f3e53;
             border-left: 6px solid #2c7da0;
             padding-left: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         canvas {
@@ -138,10 +149,8 @@
             width: 100%;
         }
 
-        /* --- SECCIÓN COMPLETA DE TABLA (ocupa todo el ancho) --- */
         .table-full-section {
             margin-top: 28px;
-            margin-bottom: 20px;
             background: white;
             border-radius: 28px;
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
@@ -164,34 +173,12 @@
             font-weight: 700;
             margin: 0;
             color: #1c4e6c;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .table-header h3 span {
-            background: #e9f0f5;
-            padding: 6px 14px;
-            border-radius: 60px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #2c627e;
-        }
-
-        .period-badge {
-            background: #eef2fa;
-            padding: 6px 16px;
-            border-radius: 60px;
-            font-size: 0.8rem;
-            color: #2c5a7a;
-            font-weight: 500;
         }
 
         .tabla-scroll {
             overflow-x: auto;
             max-height: 680px;
             overflow-y: auto;
-            scrollbar-width: thin;
         }
 
         .data-table {
@@ -199,53 +186,25 @@
             border-collapse: collapse;
             font-size: 0.8rem;
             min-width: 1380px;
-            font-family: 'Segoe UI', system-ui;
         }
 
         .data-table th {
             background: #1f2e3f !important;
             color: white !important;
-            font-weight: 700;
             padding: 14px 10px;
-            font-size: 0.8rem;
-            text-align: center;
             position: sticky;
             top: 0;
             z-index: 10;
-            letter-spacing: 0.3px;
-            border-bottom: 2px solid #2f465e;
         }
 
         .data-table td {
             border: 1px solid #e2e8f0;
             padding: 10px 8px;
-            vertical-align: middle;
-            transition: background 0.1s ease;
             text-align: center;
         }
 
-        .data-table tr:hover td {
-            background-color: #fafcff;
-        }
-
-        .data-table td:first-child, .data-table th:first-child {
-            position: sticky;
-            left: 0;
-            background: white;
-            z-index: 5;
-        }
-
-        .data-table th:first-child {
-            background: #1f2e3f !important;
-            left: 0;
-            z-index: 15;
-        }
-
-        /* Estilos de celdas */
         .badge-tipo {
             display: inline-flex;
-            align-items: center;
-            gap: 6px;
             background: #eef2fa;
             padding: 4px 12px;
             border-radius: 60px;
@@ -253,179 +212,487 @@
             font-weight: 700;
         }
 
-        .badge-especial {
-            background: #e1f0fa;
-            color: #1c6f9c;
+        .exceso-bueno { background: #dff6ed; color: #0b5e3a; }
+        .falta-malo { background: #ffe9e9; color: #b91c1c; }
+        .ok-neutral { background: #f1f5f9; color: #2c5d7c; }
+        .ausencia-justificada { background: #fff3e0; color: #e67e22; }
+
+        /* Panel Admin */
+        .admin-panel {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 24px;
         }
 
-        .badge-normal {
-            background: #e6f4ea;
-            color: #2c6e3c;
+        .admin-section {
+            margin-bottom: 32px;
+            padding: 20px;
+            background: #f8fafd;
+            border-radius: 20px;
         }
 
-        .exceso-bueno {
-            background: #dff6ed;
-            color: #0b5e3a;
-            font-weight: 600;
+        .admin-section h3 {
+            margin-top: 0;
+            color: #1e4b6e;
         }
 
-        .falta-malo {
-            background: #ffe9e9;
-            color: #b91c1c;
-            font-weight: 600;
+        .grid-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        .ok-neutral {
-            background: #f1f5f9;
-            color: #2c5d7c;
+        .config-card {
+            background: white;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid #e2edf2;
         }
 
-        .tiempo-numero {
-            font-weight: 700;
+        .config-card h4 {
+            margin: 0 0 12px 0;
+            color: #1f3e53;
+        }
+
+        .dias-laborales {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .dia-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             font-size: 0.85rem;
         }
 
-        .small-note {
-            font-size: 0.65rem;
-            color: #5f7f9e;
-            display: block;
-            margin-top: 4px;
+        .ausencia-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
         }
 
-        .diff-text {
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .badge-icon {
+        .btn-small {
+            padding: 4px 12px;
             font-size: 0.75rem;
+            min-width: auto;
         }
 
-        footer {
-            text-align: center;
-            margin-top: 32px;
-            color: #7b8c9e;
-            font-size: 0.75rem;
-            border-top: 1px solid #dce5ec;
-            padding-top: 20px;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 28px;
+            max-width: 500px;
+            width: 90%;
         }
 
         @media (max-width: 1000px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            body {
-                padding: 16px;
-            }
+            .charts-grid { grid-template-columns: 1fr; }
+            body { padding: 16px; }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>📊 Tiempos de Agentes</h1>
-    <div style="text-align: center;">
-        
-    </div>
-
-    <div class="filters">
-        <div class="filter-group"><label>📆 Periodo</label><select id="periodoSelect"><option value="dia">Día</option><option value="semana">Semana</option><option value="mes">Mes</option></select></div>
-        <div class="filter-group"><label>🗓️ Segmento</label><select id="valorSelect"></select></div>
-        <div class="filter-group"><label>👤 Agente</label><select id="agenteSelect"><option value="TODOS">📋 Todos los agentes</option></select></div>
-        <div class="filter-group"><button id="refreshBtn" class="btn-refresh">🔄 Actualizar dashboard</button></div>
-    </div>
-
-    <!-- Gráficos principales en grilla doble -->
-    <div class="charts-grid">
-        <div class="card-chart"><h3>⏱️ Tiempos productivos (horas)</h3><canvas id="chartTiempos"></canvas></div>
-        <div class="card-chart"><h3>⏳ Desviación de pausas (minutos)</h3><canvas id="chartCumplimiento"></canvas></div>
-        <div class="card-chart"><h3>⚠️ Excesos detectados (minutos)</h3><canvas id="chartExcesos"></canvas></div>
-        
-           
-       
-    </div>
-
-    <!-- SECCIÓN COMPLETA DE TABLA - Ocupa ancho total -->
-    <div class="table-full-section">
-        <div class="table-header">
-            <h3>📋 Resumen detallado por agente <span></span></h3>
-            <div class="period-badge" id="periodoInfoLabel">📅 Periodo actual</div> 
-        </div>
-        <div class="tabla-scroll" id="tablaResumenWrapper">
-            <!-- La tabla se inyecta dinámicamente aquí -->
-            <div style="padding: 20px; text-align: center; color: #5f7f9e;">⚙️ Cargando información de rendimiento...</div>
-        </div>
-    </div>
     
+    <!-- Pestañas -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="cambiarTab('dashboard')">📈 Dashboard</button>
+        <button class="tab-btn" onclick="cambiarTab('admin')">⚙️ Administración</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="tab-dashboard" class="tab-content active">
+        <div class="filters">
+            <div class="filter-group"><label>📆 Periodo</label><select id="periodoSelect"><option value="dia">Día</option><option value="semana">Semana</option><option value="mes">Mes</option></select></div>
+            <div class="filter-group"><label>🗓️ Segmento</label><select id="valorSelect"></select></div>
+            <div class="filter-group"><label>👤 Agente</label><select id="agenteSelect"><option value="TODOS">📋 Todos los agentes</option></select></div>
+            <div class="filter-group"><button id="refreshBtn">🔄 Actualizar</button></div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="card-chart"><h3>⏱️ Tiempos productivos (horas)</h3><canvas id="chartTiempos"></canvas></div>
+            <div class="card-chart"><h3>⏳ Desviación de pausas (minutos)</h3><canvas id="chartCumplimiento"></canvas></div>
+            <div class="card-chart"><h3>⚠️ Excesos detectados (minutos)</h3><canvas id="chartExcesos"></canvas></div>
+        </div>
+
+        <div class="table-full-section">
+            <div class="table-header">
+                <h3>📋 Resumen detallado por agente</h3>
+                <div class="period-badge" id="periodoInfoLabel">📅 Periodo actual</div>
+            </div>
+            <div class="tabla-scroll" id="tablaResumenWrapper">
+                <div style="padding: 20px; text-align: center;">⚙️ Cargando...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Administración -->
+    <div id="tab-admin" class="tab-content">
+        <div class="admin-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>⚙️ Configuración de Ausencias y Horarios</h2>
+                <div>
+                    <button onclick="exportarConfiguracion()" style="margin-right: 10px;">📤 Exportar</button>
+                    <button onclick="importarConfiguracion()">📥 Importar</button>
+                </div>
+            </div>
+
+            <!-- Días festivos globales -->
+            <div class="admin-section">
+                <h3>📅 Días Festivos Globales</h3>
+                <div class="grid-config">
+                    <div class="config-card">
+                        <h4>Agregar día festivo</h4>
+                        <input type="date" id="nuevoFestivo">
+                        <input type="text" id="festivoNombre" placeholder="Nombre (Ej: Navidad)" style="margin-top: 8px;">
+                        <button onclick="agregarDiaFestivo()" style="margin-top: 8px;">➕ Agregar</button>
+                    </div>
+                    <div class="config-card">
+                        <h4>Días festivos actuales</h4>
+                        <div id="listaFestivos"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración por agente -->
+            <div class="admin-section">
+                <h3>👥 Configuración por Agente</h3>
+                <select id="agenteConfigSelect" onchange="cargarConfigAgente()">
+                    <option value="">Seleccionar agente...</option>
+                </select>
+                
+                <div id="configAgentePanel" style="margin-top: 20px;">
+                    <div class="grid-config">
+                        <div class="config-card">
+                            <h4>📆 Días laborales</h4>
+                            <div class="dias-laborales" id="diasLaboralesCheckboxes"></div>
+                        </div>
+                        <div class="config-card">
+                            <h4>🏖️ Ausencias programadas</h4>
+                            <div id="ausenciasLista"></div>
+                            <div style="margin-top: 12px;">
+                                <select id="tipoAusencia">
+                                    <option value="vacaciones">Vacaciones</option>
+                                    <option value="permiso">Permiso</option>
+                                    <option value="capacitacion">Capacitación</option>
+                                    <option value="enfermedad">Enfermedad</option>
+                                </select>
+                                <input type="date" id="fechaAusencia">
+                                <button onclick="agregarAusencia()" class="btn-small">➕</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button onclick="guardarConfiguracion()" style="background: #2c7da0;">💾 Guardar configuración</button>
+                <button onclick="resetearConfiguracion()" style="background: #e76f51;">🔄 Resetear a valores por defecto</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    // ===================== DATOS (mismos registros actualizados) =====================
-  const datosCompletos = [		
-      {Fecha:"	2026-05-02	", Nombre:"	 ADRIANA ANGELICA FLORES RAMIREZ	", Llamadas:	104	, Total:	288.1	, DISPONIBLE:	78.7	, EN_LLAMADA:	56.2	, DESPUES_LLAMADA:	23.1	, PAUSA:	15.9	, PAUSECOMIDA:	0.1	, PAUSECOTIZACION:	9.8	, PAUSERETRO:	17.7	, PAUSEBAÑO:	0	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-02	", Nombre:"	PAMELA VALERIA  ARELLANO MARADIAGA	", Llamadas:	127	, Total:	293.4	, DISPONIBLE:	104.2	, EN_LLAMADA:	127.7	, DESPUES_LLAMADA:	26.7	, PAUSA:	0	, PAUSECOMIDA:	20.3	, PAUSECOTIZACION:	3.1	, PAUSERETRO:	0	, PAUSEBAÑO:	0.00537037	, PAUSECAPACITACION:	2.8	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-02	", Nombre:"	JAIME PACHECO GONZALEZ	", Llamadas:	115	, Total:	296.9	, DISPONIBLE:	81.6	, EN_LLAMADA:	88.8	, DESPUES_LLAMADA:	20.3	, PAUSA:	1.1	, PAUSECOMIDA:	24.3	, PAUSECOTIZACION:	55.8	, PAUSERETRO:	0	, PAUSEBAÑO:	0	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-02	", Nombre:"	WENDY VERONICA BAEZ MONROY	", Llamadas:	118	, Total:	292.3	, DISPONIBLE:	80.5	, EN_LLAMADA:	128	, DESPUES_LLAMADA:	34.7	, PAUSA:	1.5	, PAUSECOMIDA:	0	, PAUSECOTIZACION:	0	, PAUSERETRO:	20.1	, PAUSEBAÑO:	0.005069444	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-02	", Nombre:"	ROBERTO JAIR NAVARRETE CARRILLO	", Llamadas:	107	, Total:	290.5	, DISPONIBLE:	86.9	, EN_LLAMADA:	80.4	, DESPUES_LLAMADA:	17.7	, PAUSA:	0	, PAUSECOMIDA:	24.7	, PAUSECOTIZACION:	22.8	, PAUSERETRO:	0	, PAUSEBAÑO:	0.004583333	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-04	", Nombre:"	ERICA TERESA PADILLA TORRES	", Llamadas:	195	, Total:	517.9	, DISPONIBLE:	108.1	, EN_LLAMADA:	100.5	, DESPUES_LLAMADA:	36.9	, PAUSA:	43.3	, PAUSECOMIDA:	60.5	, PAUSECOTIZACION:	0	, PAUSERETRO:	5.8	, PAUSEBAÑO:	0.013078704	, PAUSECAPACITACION:	60.2	, PAUSERETROCALIDAD:	0.9	},
-{Fecha:"	2026-05-04	", Nombre:"	AIDE SILVIA  CASTRO MORALES 	", Llamadas:	181	, Total:	583.6	, DISPONIBLE:	77.4	, EN_LLAMADA:	214.9	, DESPUES_LLAMADA:	22.4	, PAUSA:	0.7	, PAUSECOMIDA:	56.6	, PAUSECOTIZACION:	0	, PAUSERETRO:	20.5	, PAUSEBAÑO:	0.004953704	, PAUSECAPACITACION:	50.6	, PAUSERETROCALIDAD:	15.1	},
-{Fecha:"	2026-05-04	", Nombre:"	Yunuen  Garcia Zarazua	", Llamadas:	92	, Total:	170.1	, DISPONIBLE:	47.8	, EN_LLAMADA:	73.6	, DESPUES_LLAMADA:	21.5	, PAUSA:	1.7	, PAUSECOMIDA:	0	, PAUSECOTIZACION:	0	, PAUSERETRO:	0	, PAUSEBAÑO:	0.003101852	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-04	", Nombre:"	 ADRIANA ANGELICA FLORES RAMIREZ	", Llamadas:	189	, Total:	358	, DISPONIBLE:	116.2	, EN_LLAMADA:	127.2	, DESPUES_LLAMADA:	43.6	, PAUSA:	2.2	, PAUSECOMIDA:	20.7	, PAUSECOTIZACION:	16.7	, PAUSERETRO:	6.3	, PAUSEBAÑO:	0.002719907	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-04	", Nombre:"	JATZIRI NOHEMI SANCHEZ ARELLANO	", Llamadas:	156	, Total:	358.2	, DISPONIBLE:	99.2	, EN_LLAMADA:	165.5	, DESPUES_LLAMADA:	23.7	, PAUSA:	0	, PAUSECOMIDA:	22.1	, PAUSECOTIZACION:	8.1	, PAUSERETRO:	12.7	, PAUSEBAÑO:	0.003321759	, PAUSECAPACITACION:	1.4	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-04	", Nombre:"	MARIA GUADALUPE  LOPEZ FLORES 	", Llamadas:	264	, Total:	537	, DISPONIBLE:	148.1	, EN_LLAMADA:	197.4	, DESPUES_LLAMADA:	48.4	, PAUSA:	38.9	, PAUSECOMIDA:	59.8	, PAUSECOTIZACION:	0	, PAUSERETRO:	9.4	, PAUSEBAÑO:	0	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-04	", Nombre:"	ROBERTO JAIR NAVARRETE CARRILLO	", Llamadas:	227	, Total:	541.7	, DISPONIBLE:	135	, EN_LLAMADA:	186.3	, DESPUES_LLAMADA:	31.4	, PAUSA:	6.4	, PAUSECOMIDA:	59.2	, PAUSECOTIZACION:	43.1	, PAUSERETRO:	20.2	, PAUSEBAÑO:	0.005011574	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-04	", Nombre:"	PAMELA VALERIA  ARELLANO MARADIAGA	", Llamadas:	146	, Total:	354.6	, DISPONIBLE:	90.6	, EN_LLAMADA:	171.7	, DESPUES_LLAMADA:	28.3	, PAUSA:	0	, PAUSECOMIDA:	22.2	, PAUSECOTIZACION:	16	, PAUSERETRO:	0	, PAUSEBAÑO:	0.006886574	, PAUSECAPACITACION:	12.7	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-04	", Nombre:"	JAIME PACHECO GONZALEZ	", Llamadas:	139	, Total:	362	, DISPONIBLE:	76.8	, EN_LLAMADA:	132.5	, DESPUES_LLAMADA:	22.4	, PAUSA:	4.8	, PAUSECOMIDA:	29.6	, PAUSECOTIZACION:	45.6	, PAUSERETRO:	11.2	, PAUSEBAÑO:	0	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-04	", Nombre:"	WENDY VERONICA BAEZ MONROY	", Llamadas:	150	, Total:	351.8	, DISPONIBLE:	85.2	, EN_LLAMADA:	148	, DESPUES_LLAMADA:	38.6	, PAUSA:	0.3	, PAUSECOMIDA:	21.1	, PAUSECOTIZACION:	0	, PAUSERETRO:	11.1	, PAUSEBAÑO:	0.002384259	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	ERICA TERESA PADILLA TORRES	", Llamadas:	107	, Total:	300.1	, DISPONIBLE:	71	, EN_LLAMADA:	59.6	, DESPUES_LLAMADA:	19.9	, PAUSA:	65.6	, PAUSECOMIDA:	0	, PAUSECOTIZACION:	0	, PAUSERETRO:	0	, PAUSEBAÑO:	0.003032407	, PAUSECAPACITACION:	37.2	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	AIDE SILVIA  CASTRO MORALES 	", Llamadas:	201	, Total:	564.1	, DISPONIBLE:	106.3	, EN_LLAMADA:	166.1	, DESPUES_LLAMADA:	25.5	, PAUSA:	0.1	, PAUSECOMIDA:	58.4	, PAUSECOTIZACION:	2.1	, PAUSERETRO:	20.2	, PAUSEBAÑO:	0.004861111	, PAUSECAPACITACION:	38.6	, PAUSERETROCALIDAD:	15.1	},
-{Fecha:"	2026-05-05	", Nombre:"	Yunuen  Garcia Zarazua	", Llamadas:	240	, Total:	539.9	, DISPONIBLE:	180.8	, EN_LLAMADA:	204.6	, DESPUES_LLAMADA:	54.8	, PAUSA:	24.9	, PAUSECOMIDA:	60.1	, PAUSECOTIZACION:	0	, PAUSERETRO:	3	, PAUSEBAÑO:	0.008125	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	JATZIRI NOHEMI SANCHEZ ARELLANO	", Llamadas:	135	, Total:	358.5	, DISPONIBLE:	86	, EN_LLAMADA:	157.8	, DESPUES_LLAMADA:	21.7	, PAUSA:	0	, PAUSECOMIDA:	59	, PAUSECOTIZACION:	0	, PAUSERETRO:	20.3	, PAUSEBAÑO:	0	, PAUSECAPACITACION:	7.9	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	PAMELA VALERIA  ARELLANO MARADIAGA	", Llamadas:	138	, Total:	356.3	, DISPONIBLE:	75.7	, EN_LLAMADA:	133.8	, DESPUES_LLAMADA:	26.5	, PAUSA:	0.3	, PAUSECOMIDA:	58.4	, PAUSECOTIZACION:	14.4	, PAUSERETRO:	20.2	, PAUSEBAÑO:	0.003009259	, PAUSECAPACITACION:	0.9	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	Jessica Gomez Zarazua	", Llamadas:	206	, Total:	520.7	, DISPONIBLE:	152.3	, EN_LLAMADA:	74.7	, DESPUES_LLAMADA:	51	, PAUSA:	4.7	, PAUSECOMIDA:	58.2	, PAUSECOTIZACION:	46	, PAUSERETRO:	20	, PAUSEBAÑO:	0.014166667	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	ROBERTO JAIR NAVARRETE CARRILLO	", Llamadas:	201	, Total:	532.2	, DISPONIBLE:	127.5	, EN_LLAMADA:	183.9	, DESPUES_LLAMADA:	24	, PAUSA:	6	, PAUSECOMIDA:	60.4	, PAUSECOTIZACION:	38.6	, PAUSERETRO:	20.4	, PAUSEBAÑO:	0.008530093	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	MARIA GUADALUPE  LOPEZ FLORES 	", Llamadas:	246	, Total:	537.8	, DISPONIBLE:	144.8	, EN_LLAMADA:	165	, DESPUES_LLAMADA:	39.8	, PAUSA:	7.4	, PAUSECOMIDA:	54.8	, PAUSECOTIZACION:	0	, PAUSERETRO:	20	, PAUSEBAÑO:	0.003981481	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	7.9	},
-{Fecha:"	2026-05-05	", Nombre:"	JAIME PACHECO GONZALEZ	", Llamadas:	124	, Total:	364.2	, DISPONIBLE:	69.8	, EN_LLAMADA:	95.4	, DESPUES_LLAMADA:	21.8	, PAUSA:	2.1	, PAUSECOMIDA:	59.6	, PAUSECOTIZACION:	60	, PAUSERETRO:	20.5	, PAUSEBAÑO:	0	, PAUSECAPACITACION:	2.4	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	Nataly  Castrejón linares	", Llamadas:	31	, Total:	174.7	, DISPONIBLE:	26.2	, EN_LLAMADA:	42.8	, DESPUES_LLAMADA:	7.9	, PAUSA:	0	, PAUSECOMIDA:	60.2	, PAUSECOTIZACION:	3.6	, PAUSERETRO:	19.4	, PAUSEBAÑO:	0.003101852	, PAUSECAPACITACION:	1.9	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	WENDY VERONICA BAEZ MONROY	", Llamadas:	135	, Total:	354.5	, DISPONIBLE:	78.1	, EN_LLAMADA:	115.5	, DESPUES_LLAMADA:	22.8	, PAUSA:	0.1	, PAUSECOMIDA:	54.1	, PAUSECOTIZACION:	0	, PAUSERETRO:	20	, PAUSEBAÑO:	0.004016204	, PAUSECAPACITACION:	3.1	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	NADIRAM RESENDIZ PERALTA	", Llamadas:	52	, Total:	157.7	, DISPONIBLE:	55.3	, EN_LLAMADA:	30	, DESPUES_LLAMADA:	13.4	, PAUSA:	0	, PAUSECOMIDA:	0	, PAUSECOTIZACION:	0	, PAUSERETRO:	20.4	, PAUSEBAÑO:	0.002800926	, PAUSECAPACITACION:	23.5	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-05	", Nombre:"	SANDRA PAOLA  VELAZQUEZ REYES 	", Llamadas:	50	, Total:	155.5	, DISPONIBLE:	47.9	, EN_LLAMADA:	35.1	, DESPUES_LLAMADA:	10.2	, PAUSA:	0	, PAUSECOMIDA:	0	, PAUSECOTIZACION:	9.8	, PAUSERETRO:	20.2	, PAUSEBAÑO:	0.002962963	, PAUSECAPACITACION:	22.2	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	AIDE SILVIA  CASTRO MORALES 	", Llamadas:	191	, Total:	575.7	, DISPONIBLE:	88.2	, EN_LLAMADA:	166.3	, DESPUES_LLAMADA:	22.2	, PAUSA:	0	, PAUSECOMIDA:	60.20	, PAUSECOTIZACION:	0	, PAUSERETRO:	20.1	, PAUSEBAÑO:	15.2	, PAUSECAPACITACION:	7.7	, PAUSERETROCALIDAD:	15.3	},
-{Fecha:"	2026-05-06	", Nombre:"	ERICA TERESA PADILLA TORRES	", Llamadas:	207	, Total:	510.4	, DISPONIBLE:	131.1	, EN_LLAMADA:	70.8	, DESPUES_LLAMADA:	27.7	, PAUSA:	12.2	, PAUSECOMIDA:	60.30	, PAUSECOTIZACION:	0.6	, PAUSERETRO:	19.5	, PAUSEBAÑO:	16.7	, PAUSECAPACITACION:	60.1	, PAUSERETROCALIDAD:	15.1	},
-{Fecha:"	2026-05-06	", Nombre:"	PAMELA VALERIA  ARELLANO MARADIAGA	", Llamadas:	103	, Total:	354.5	, DISPONIBLE:	72	, EN_LLAMADA:	161.1	, DESPUES_LLAMADA:	15.9	, PAUSA:	0	, PAUSECOMIDA:	21.30	, PAUSECOTIZACION:	27.4	, PAUSERETRO:	20.5	, PAUSEBAÑO:	9.8	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0.1	},
-{Fecha:"	2026-05-06	", Nombre:"	JATZIRI NOHEMI SANCHEZ ARELLANO	", Llamadas:	149	, Total:	351	, DISPONIBLE:	112.1	, EN_LLAMADA:	206.1	, DESPUES_LLAMADA:	18.2	, PAUSA:	0.7	, PAUSECOMIDA:	0.00	, PAUSECOTIZACION:	0	, PAUSERETRO:	0	, PAUSEBAÑO:	0	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	Yunuen  Garcia Zarazua	", Llamadas:	279	, Total:	537.1	, DISPONIBLE:	209.6	, EN_LLAMADA:	207.9	, DESPUES_LLAMADA:	47.4	, PAUSA:	0	, PAUSECOMIDA:	58.90	, PAUSECOTIZACION:	0	, PAUSERETRO:	0	, PAUSEBAÑO:	9.2	, PAUSECAPACITACION:	0.7	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	Jessica Gomez Zarazua	", Llamadas:	309	, Total:	527.8	, DISPONIBLE:	227	, EN_LLAMADA:	108.2	, DESPUES_LLAMADA:	66.4	, PAUSA:	9.3	, PAUSECOMIDA:	60.40	, PAUSECOTIZACION:	26.1	, PAUSERETRO:	0	, PAUSEBAÑO:	20.3	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	MARIA GUADALUPE  LOPEZ FLORES 	", Llamadas:	245	, Total:	536.1	, DISPONIBLE:	160.6	, EN_LLAMADA:	173.6	, DESPUES_LLAMADA:	36.8	, PAUSA:	4.1	, PAUSECOMIDA:	59.60	, PAUSECOTIZACION:	0	, PAUSERETRO:	1.9	, PAUSEBAÑO:	5	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	ROBERTO JAIR NAVARRETE CARRILLO	", Llamadas:	197	, Total:	521.8	, DISPONIBLE:	124.6	, EN_LLAMADA:	194	, DESPUES_LLAMADA:	23.3	, PAUSA:	5.5	, PAUSECOMIDA:	60.10	, PAUSECOTIZACION:	60.4	, PAUSERETRO:	14.9	, PAUSEBAÑO:	8.3	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	JAIME PACHECO GONZALEZ	", Llamadas:	99	, Total:	353.1	, DISPONIBLE:	70.2	, EN_LLAMADA:	145.1	, DESPUES_LLAMADA:	16.7	, PAUSA:	0.8	, PAUSECOMIDA:	27.60	, PAUSECOTIZACION:	60.5	, PAUSERETRO:	4.7	, PAUSEBAÑO:	0	, PAUSECAPACITACION:	5.1	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	Diana Magaly  Hernández Gil	", Llamadas:	126	, Total:	306.8	, DISPONIBLE:	90.9	, EN_LLAMADA:	122.7	, DESPUES_LLAMADA:	14.9	, PAUSA:	0	, PAUSECOMIDA:	20.10	, PAUSECOTIZACION:	11.1	, PAUSERETRO:	18.1	, PAUSEBAÑO:	7	, PAUSECAPACITACION:	18	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	Nataly  Castrejón linares	", Llamadas:	139	, Total:	322.3	, DISPONIBLE:	102	, EN_LLAMADA:	111.1	, DESPUES_LLAMADA:	26.5	, PAUSA:	0	, PAUSECOMIDA:	21.00	, PAUSECOTIZACION:	14	, PAUSERETRO:	20.1	, PAUSEBAÑO:	3.6	, PAUSECAPACITACION:	6.8	, PAUSERETROCALIDAD:	8.7	},
-{Fecha:"	2026-05-06	", Nombre:"	SANDRA PAOLA  VELAZQUEZ REYES 	", Llamadas:	176	, Total:	337	, DISPONIBLE:	142.6	, EN_LLAMADA:	114.3	, DESPUES_LLAMADA:	22	, PAUSA:	0	, PAUSECOMIDA:	26.50	, PAUSECOTIZACION:	6.4	, PAUSERETRO:	8	, PAUSEBAÑO:	5.5	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	NADIRAM RESENDIZ PERALTA	", Llamadas:	162	, Total:	335.9	, DISPONIBLE:	131.1	, EN_LLAMADA:	109.8	, DESPUES_LLAMADA:	35.4	, PAUSA:	0.4	, PAUSECOMIDA:	27.30	, PAUSECOTIZACION:	10.6	, PAUSERETRO:	7	, PAUSEBAÑO:	13.9	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	},
-{Fecha:"	2026-05-06	", Nombre:"	WENDY VERONICA BAEZ MONROY	", Llamadas:	141	, Total:	351.6	, DISPONIBLE:	91.4	, EN_LLAMADA:	148.2	, DESPUES_LLAMADA:	23.1	, PAUSA:	0.1	, PAUSECOMIDA:	22.00	, PAUSECOTIZACION:	0	, PAUSERETRO:	4.6	, PAUSEBAÑO:	4.2	, PAUSECAPACITACION:	0	, PAUSERETROCALIDAD:	0	}
-  ];
+    // ===================== DATOS ORIGINALES =====================
+    const datosCompletos = [		
+        {Fecha:"2026-05-02", Nombre:"ADRIANA ANGELICA FLORES RAMIREZ", Llamadas:104, Total:288.1, DISPONIBLE:78.7, EN_LLAMADA:56.2, DESPUES_LLAMADA:23.1, PAUSA:15.9, PAUSECOMIDA:0.1, PAUSECOTIZACION:9.8, PAUSERETRO:17.7, PAUSEBAÑO:0, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0},
+        {Fecha:"2026-05-02", Nombre:"PAMELA VALERIA  ARELLANO MARADIAGA", Llamadas:127, Total:293.4, DISPONIBLE:104.2, EN_LLAMADA:127.7, DESPUES_LLAMADA:26.7, PAUSA:0, PAUSECOMIDA:20.3, PAUSECOTIZACION:3.1, PAUSERETRO:0, PAUSEBAÑO:0.00537037, PAUSECAPACITACION:2.8, PAUSERETROCALIDAD:0},
+        {Fecha:"2026-05-02", Nombre:"JAIME PACHECO GONZALEZ", Llamadas:115, Total:296.9, DISPONIBLE:81.6, EN_LLAMADA:88.8, DESPUES_LLAMADA:20.3, PAUSA:1.1, PAUSECOMIDA:24.3, PAUSECOTIZACION:55.8, PAUSERETRO:0, PAUSEBAÑO:0, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0},
+        {Fecha:"2026-05-02", Nombre:"WENDY VERONICA BAEZ MONROY", Llamadas:118, Total:292.3, DISPONIBLE:80.5, EN_LLAMADA:128, DESPUES_LLAMADA:34.7, PAUSA:1.5, PAUSECOMIDA:0, PAUSECOTIZACION:0, PAUSERETRO:20.1, PAUSEBAÑO:0.005069444, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0},
+        {Fecha:"2026-05-02", Nombre:"ROBERTO JAIR NAVARRETE CARRILLO", Llamadas:107, Total:290.5, DISPONIBLE:86.9, EN_LLAMADA:80.4, DESPUES_LLAMADA:17.7, PAUSA:0, PAUSECOMIDA:24.7, PAUSECOTIZACION:22.8, PAUSERETRO:0, PAUSEBAÑO:0.004583333, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0},
+        {Fecha:"2026-05-04", Nombre:"ERICA TERESA PADILLA TORRES", Llamadas:195, Total:517.9, DISPONIBLE:108.1, EN_LLAMADA:100.5, DESPUES_LLAMADA:36.9, PAUSA:43.3, PAUSECOMIDA:60.5, PAUSECOTIZACION:0, PAUSERETRO:5.8, PAUSEBAÑO:0.013078704, PAUSECAPACITACION:60.2, PAUSERETROCALIDAD:0.9},
+        {Fecha:"2026-05-04", Nombre:"AIDE SILVIA  CASTRO MORALES", Llamadas:181, Total:583.6, DISPONIBLE:77.4, EN_LLAMADA:214.9, DESPUES_LLAMADA:22.4, PAUSA:0.7, PAUSECOMIDA:56.6, PAUSECOTIZACION:0, PAUSERETRO:20.5, PAUSEBAÑO:0.004953704, PAUSECAPACITACION:50.6, PAUSERETROCALIDAD:15.1},
+        {Fecha:"2026-05-04", Nombre:"Yunuen  Garcia Zarazua", Llamadas:92, Total:170.1, DISPONIBLE:47.8, EN_LLAMADA:73.6, DESPUES_LLAMADA:21.5, PAUSA:1.7, PAUSECOMIDA:0, PAUSECOTIZACION:0, PAUSERETRO:0, PAUSEBAÑO:0.003101852, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0},
+        {Fecha:"2026-05-04", Nombre:"ADRIANA ANGELICA FLORES RAMIREZ", Llamadas:189, Total:358, DISPONIBLE:116.2, EN_LLAMADA:127.2, DESPUES_LLAMADA:43.6, PAUSA:2.2, PAUSECOMIDA:20.7, PAUSECOTIZACION:16.7, PAUSERETRO:6.3, PAUSEBAÑO:0.002719907, PAUSECAPACITACION:0, PAUSERETROCALIDAD:0},
+        {Fecha:"2026-05-04", Nombre:"JATZIRI NOHEMI SANCHEZ ARELLANO", Llamadas:156, Total:358.2, DISPONIBLE:99.2, EN_LLAMADA:165.5, DESPUES_LLAMADA:23.7, PAUSA:0, PAUSECOMIDA:22.1, PAUSECOTIZACION:8.1, PAUSERETRO:12.7, PAUSEBAÑO:0.003321759, PAUSECAPACITACION:1.4, PAUSERETROCALIDAD:0}
+    ];
 
-    // AGENTES ESPECIALES (medio tiempo)
     const AGENTES_ESPECIALES = [
-        "PAMELA VALERIA  ARELLANO MARADIAGA", "JESUS ANGEL ZAVALA SANCHEZ", "JAIME PACHECO GONZALEZ", "NADIRAM RESENDIZ PERALTA", "SANDRA PAOLA  VELAZQUEZ REYES",
-        "WENDY VERONICA BAEZ MONROY", "ADRIANA ANGELICA FLORES RAMIREZ", "JATZIRI NOHEMI SANCHEZ ARELLANO", "Nataly  Castrejón linares", "Diana Magaly  Hernández Gil"
+        "PAMELA VALERIA  ARELLANO MARADIAGA", "JAIME PACHECO GONZALEZ", 
+        "WENDY VERONICA BAEZ MONROY", "ADRIANA ANGELICA FLORES RAMIREZ", 
+        "JATZIRI NOHEMI SANCHEZ ARELLANO"
     ];
     
-    // REGLAS actualizadas: jornada normal = 540 min (9h), especial = 300 min (5h)
     const REGLAS = {
-        normal: { 
-            comida: 60, bano: 15, retro: 15, capacitacion: 30, cotizacion: 15, retroCalidad: 10, 
-            jornadaMinutos: 540, despuesLlamadaPorLlamada: 0.25 
-        },
-        especial: { 
-            comida: 20, bano: 10, retro: 15, capacitacion: 30, cotizacion: 15, retroCalidad: 10,
-            jornadaMinutos: 360, despuesLlamadaPorLlamada: 0.25 
-        }
+        normal: { comida: 60, bano: 15, retro: 15, capacitacion: 30, cotizacion: 15, retroCalidad: 10, jornadaMinutos: 540, despuesLlamadaPorLlamada: 0.25 },
+        especial: { comida: 20, bano: 10, retro: 15, capacitacion: 30, cotizacion: 15, retroCalidad: 10, jornadaMinutos: 360, despuesLlamadaPorLlamada: 0.25 }
     };
     
-    const DIAS_LABORALES = { dia: 1, semana: 6, mes: 4 };
-    
+    // ===================== CONFIGURACIÓN DE AUSENCIAS =====================
+    let configuracion = {
+        diasFestivos: [
+            { fecha: "2026-05-01", nombre: "Día del Trabajo" },
+            { fecha: "2026-05-05", nombre: "Batalla de Puebla" }
+        ],
+        agentes: {}
+    };
+
+    // Inicializar configuración para cada agente
+    function inicializarConfiguracion() {
+        const agentesUnicos = [...new Set(datosCompletos.map(d => d.Nombre.trim()))];
+        
+        agentesUnicos.forEach(agente => {
+            if (!configuracion.agentes[agente]) {
+                configuracion.agentes[agente] = {
+                    diasLaborales: ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES"],
+                    ausencias: [] // { fecha, tipo, descripcion }
+                };
+            }
+        });
+        
+        // Guardar en localStorage
+        localStorage.setItem('configuracionAusencias', JSON.stringify(configuracion));
+    }
+
+    // Cargar configuración guardada
+    function cargarConfiguracion() {
+        const guardada = localStorage.getItem('configuracionAusencias');
+        if (guardada) {
+            configuracion = JSON.parse(guardada);
+        } else {
+            inicializarConfiguracion();
+        }
+        actualizarUIAdmin();
+    }
+
+    // Guardar configuración actual
+    function guardarConfiguracion() {
+        localStorage.setItem('configuracionAusencias', JSON.stringify(configuracion));
+        alert('✅ Configuración guardada exitosamente');
+        renderDashboard(); // Refrescar dashboard
+    }
+
+    // Resetear a valores por defecto
+    function resetearConfiguracion() {
+        if (confirm('¿Estás seguro de resetear toda la configuración?')) {
+            configuracion = {
+                diasFestivos: [
+                    { fecha: "2026-05-01", nombre: "Día del Trabajo" },
+                    { fecha: "2026-05-05", nombre: "Batalla de Puebla" }
+                ],
+                agentes: {}
+            };
+            inicializarConfiguracion();
+            actualizarUIAdmin();
+            renderDashboard();
+            alert('✅ Configuración reseteada');
+        }
+    }
+
+    // Verificar si una fecha es festiva
+    function esDiaFestivo(fecha) {
+        return configuracion.diasFestivos.some(f => f.fecha === fecha);
+    }
+
+    // Verificar si un agente tiene ausencia justificada
+    function tieneAusenciaJustificada(agente, fecha) {
+        const ausencias = configuracion.agentes[agente]?.ausencias || [];
+        return ausencias.some(a => a.fecha === fecha);
+    }
+
+    // Verificar si es día laboral para el agente
+    function esDiaLaboral(agente, fecha) {
+        const diasSemana = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+        const diaNombre = diasSemana[new Date(fecha).getDay()];
+        
+        const diasLaborales = configuracion.agentes[agente]?.diasLaborales || 
+                             ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES"];
+        
+        return diasLaborales.includes(diaNombre);
+    }
+
+    // Obtener tipo de ausencia para mostrar
+    function getTipoAusencia(agente, fecha) {
+        const ausencia = configuracion.agentes[agente]?.ausencias.find(a => a.fecha === fecha);
+        return ausencia ? ausencia.tipo : null;
+    }
+
+    // Agregar día festivo
+    function agregarDiaFestivo() {
+        const fecha = document.getElementById('nuevoFestivo').value;
+        const nombre = document.getElementById('festivoNombre').value;
+        
+        if (!fecha) {
+            alert('Selecciona una fecha');
+            return;
+        }
+        
+        configuracion.diasFestivos.push({ fecha, nombre: nombre || 'Festivo' });
+        guardarConfiguracion();
+        actualizarUIAdmin();
+        document.getElementById('nuevoFestivo').value = '';
+        document.getElementById('festivoNombre').value = '';
+    }
+
+    // Eliminar día festivo
+    function eliminarDiaFestivo(index) {
+        configuracion.diasFestivos.splice(index, 1);
+        guardarConfiguracion();
+        actualizarUIAdmin();
+    }
+
+    // Agregar ausencia a agente
+    function agregarAusencia() {
+        const agente = document.getElementById('agenteConfigSelect').value;
+        const tipo = document.getElementById('tipoAusencia').value;
+        const fecha = document.getElementById('fechaAusencia').value;
+        
+        if (!agente || !fecha) {
+            alert('Selecciona agente y fecha');
+            return;
+        }
+        
+        const tiposAusencia = {
+            vacaciones: '🏖️ Vacaciones',
+            permiso: '📋 Permiso',
+            capacitacion: '📚 Capacitación',
+            enfermedad: '🤒 Enfermedad'
+        };
+        
+        configuracion.agentes[agente].ausencias.push({
+            fecha: fecha,
+            tipo: tipo,
+            descripcion: tiposAusencia[tipo]
+        });
+        
+        guardarConfiguracion();
+        cargarConfigAgente();
+        document.getElementById('fechaAusencia').value = '';
+    }
+
+    // Eliminar ausencia
+    function eliminarAusencia(agente, index) {
+        configuracion.agentes[agente].ausencias.splice(index, 1);
+        guardarConfiguracion();
+        cargarConfigAgente();
+    }
+
+    // Actualizar días laborales del agente
+    function actualizarDiasLaborales(agente, dia, checked) {
+        if (checked) {
+            if (!configuracion.agentes[agente].diasLaborales.includes(dia)) {
+                configuracion.agentes[agente].diasLaborales.push(dia);
+            }
+        } else {
+            const index = configuracion.agentes[agente].diasLaborales.indexOf(dia);
+            if (index > -1) {
+                configuracion.agentes[agente].diasLaborales.splice(index, 1);
+            }
+        }
+        guardarConfiguracion();
+    }
+
+    // Actualizar UI de administración
+    function actualizarUIAdmin() {
+        // Actualizar lista de festivos
+        const listaFestivos = document.getElementById('listaFestivos');
+        if (listaFestivos) {
+            listaFestivos.innerHTML = configuracion.diasFestivos.map((f, i) => `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>${f.fecha}: ${f.nombre}</span>
+                    <button onclick="eliminarDiaFestivo(${i})" class="btn-small">❌</button>
+                </div>
+            `).join('');
+        }
+        
+        // Actualizar selector de agentes
+        const agenteSelect = document.getElementById('agenteConfigSelect');
+        if (agenteSelect && Object.keys(configuracion.agentes).length > 0) {
+            const currentValue = agenteSelect.value;
+            agenteSelect.innerHTML = '<option value="">Seleccionar agente...</option>' + 
+                Object.keys(configuracion.agentes).sort().map(a => 
+                    `<option value="${a}" ${currentValue === a ? 'selected' : ''}>${a}</option>`
+                ).join('');
+        }
+    }
+
+    // Cargar configuración de un agente específico
+    function cargarConfigAgente() {
+        const agente = document.getElementById('agenteConfigSelect').value;
+        if (!agente || !configuracion.agentes[agente]) return;
+        
+        const config = configuracion.agentes[agente];
+        
+        // Días laborales
+        const dias = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"];
+        const diasLaboralesHTML = dias.map(dia => `
+            <label class="dia-checkbox">
+                <input type="checkbox" ${config.diasLaborales.includes(dia) ? 'checked' : ''} 
+                       onchange="actualizarDiasLaborales('${agente}', '${dia}', this.checked)">
+                ${dia.substring(0, 3)}
+            </label>
+        `).join('');
+        document.getElementById('diasLaboralesCheckboxes').innerHTML = diasLaboralesHTML;
+        
+        // Ausencias
+        const ausenciasHTML = config.ausencias.map((a, i) => `
+            <div class="ausencia-item">
+                <span>${a.fecha}: ${a.descripcion}</span>
+                <button onclick="eliminarAusencia('${agente}', ${i})" class="btn-small">❌</button>
+            </div>
+        `).join('');
+        document.getElementById('ausenciasLista').innerHTML = ausenciasHTML || '<p>No hay ausencias registradas</p>';
+    }
+
+    // Exportar configuración
+    function exportarConfiguracion() {
+        const dataStr = JSON.stringify(configuracion, null, 2);
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'configuracion_ausencias.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Importar configuración
+    function importarConfiguracion() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const imported = JSON.parse(event.target.result);
+                    configuracion = imported;
+                    guardarConfiguracion();
+                    actualizarUIAdmin();
+                    renderDashboard();
+                    alert('✅ Configuración importada exitosamente');
+                } catch (error) {
+                    alert('Error al importar: archivo inválido');
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+
+    // Funciones originales modificadas para usar la nueva lógica de ausencias
     function getTipo(nombre) { 
         return AGENTES_ESPECIALES.includes(nombre.trim()) ? "especial" : "normal"; 
     }
@@ -442,32 +709,50 @@
         const week1 = new Date(date.getFullYear(), 0, 4);
         return 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
     }
-    
-    function procesarPeriodo(data, periodo, valor) {
-        let filtrados = [...data];
-        if (periodo === 'dia') filtrados = data.filter(d => d.Fecha === valor);
+
+    function esSabado(fechaStr) {
+        const d = new Date(fechaStr + 'T12:00:00');
+        return d.getDay() === 6;
+    }
+
+    function getAllUniqueDates() {
+        return [...new Set(datosCompletos.map(d => d.Fecha.trim()))].sort();
+    }
+
+    function getDiasEsperados(data, periodo, valor) {
+        let allDates = getAllUniqueDates();
+        
+        if (periodo === 'dia') return [valor];
         if (periodo === 'semana') {
             let semanaNum = parseInt(valor);
-            filtrados = data.filter(d => getWeekNumber(new Date(d.Fecha)) === semanaNum);
+            return allDates.filter(fecha => getWeekNumber(new Date(fecha)) === semanaNum);
         }
-        if (periodo === 'mes') filtrados = data.filter(d => d.Fecha.startsWith(valor));
-        return filtrados;
+        return allDates.filter(fecha => fecha.startsWith(valor));
     }
     
-    function agruparPorAgente(data, periodo) {
+    function procesarPeriodo(data, periodo, valor) {
+        if (periodo === 'dia') return data.filter(d => d.Fecha.trim() === valor);
+        if (periodo === 'semana') {
+            let semanaNum = parseInt(valor);
+            return data.filter(d => getWeekNumber(new Date(d.Fecha.trim())) === semanaNum);
+        }
+        return data.filter(d => d.Fecha.trim().startsWith(valor));
+    }
+    
+    function agruparPorAgente(data, periodo, diasDelPeriodo) {
         let map = new Map();
-        let diasMultiplicador = DIAS_LABORALES[periodo] || 1;
-        
+
         for (let row of data) {
             let nom = row.Nombre.trim();
+            let fecha = row.Fecha.trim();
+            
             if (!map.has(nom)) {
                 map.set(nom, { 
-                    nombre: nom, 
-                    disponible: 0, enLlamada: 0, despues: 0, 
+                    nombre: nom, disponible: 0, enLlamada: 0, despues: 0, 
                     llamadas: 0, totalConexionMinutos: 0,
                     comidaTotal: 0, banoTotal: 0, retroTotal: 0,
                     capacitacionTotal: 0, cotizacionTotal: 0, retroCalidadTotal: 0,
-                    registros: 0
+                    registros: 0, diasAsistidos: new Set(), ausenciasJustificadas: []
                 });
             }
             let acc = map.get(nom);
@@ -483,35 +768,88 @@
             acc.cotizacionTotal += row.PAUSECOTIZACION || 0;
             acc.retroCalidadTotal += row.PAUSERETROCALIDAD || 0;
             acc.registros++;
+            acc.diasAsistidos.add(fecha);
         }
         
         let resultados = [];
         for (let acc of map.values()) {
             let tipo = getTipo(acc.nombre);
             let limites = REGLAS[tipo];
+
+            let jornadaEsperada = 0;
+            let diasEsperadosContados = 0;
+            let diasFalta = [];
+            let ausenciasJustificadas = [];
             
-            let jornadaEsperada = limites.jornadaMinutos * diasMultiplicador;
-            acc.diffJornada = acc.totalConexionMinutos - jornadaEsperada;
-            
+            for (let dia of diasDelPeriodo) {
+                if (acc.diasAsistidos.has(dia)) {
+                    jornadaEsperada += (esSabado(dia) || esDiaFestivo(dia)) ? 300 : limites.jornadaMinutos;
+                    diasEsperadosContados++;
+                } else if (tieneAusenciaJustificada(acc.nombre, dia)) {
+                    ausenciasJustificadas.push(dia);
+                } else if (!esDiaLaboral(acc.nombre, dia)) {
+                    // No laborable, ignorar
+                    continue;
+                } else if (esDiaFestivo(dia)) {
+                    // Día festivo, ignorar
+                    continue;
+                } else {
+                    diasFalta.push(dia);
+                }
+            }
+
+            let limComida = 0, limBano = 0, limRetro = 0, limCap = 0, limCot = 0, limRetroC = 0;
+            for (let dia of diasDelPeriodo) {
+                if (!acc.diasAsistidos.has(dia)) continue;
+                let esDiaEspecial = esSabado(dia) || esDiaFestivo(dia);
+                let factor = esDiaEspecial ? (300 / limites.jornadaMinutos) : 1;
+                limComida += limites.comida * factor;
+                limBano += limites.bano * factor;
+                limRetro += limites.retro * factor;
+                limCap += limites.capacitacion * factor;
+                limCot += limites.cotizacion * factor;
+                limRetroC += limites.retroCalidad * factor;
+            }
+
+            let deudaComida = Math.max(0, acc.comidaTotal - limComida);
+            let deudaBano = Math.max(0, acc.banoTotal - limBano);
+            let deudaRetro = Math.max(0, acc.retroTotal - limRetro);
+            let deudaCap = Math.max(0, acc.capacitacionTotal - limCap);
+            let deudaCot = Math.max(0, acc.cotizacionTotal - limCot);
+            let deudaRetroC = Math.max(0, acc.retroCalidadTotal - limRetroC);
+            let deudaTotalPausas = deudaComida + deudaBano + deudaRetro + deudaCap + deudaCot + deudaRetroC;
+
+            let jornadaRealAjustada = acc.totalConexionMinutos - deudaTotalPausas;
+            acc.diffJornada = jornadaRealAjustada - jornadaEsperada;
+
             let despuesEsperado = acc.llamadas * limites.despuesLlamadaPorLlamada;
             acc.diffDespues = acc.despues - despuesEsperado;
             
-            acc.diffComida = acc.comidaTotal - (limites.comida * diasMultiplicador);
-            acc.diffBano = acc.banoTotal - (limites.bano * diasMultiplicador);
-            acc.diffRetro = acc.retroTotal - (limites.retro * diasMultiplicador);
-            acc.diffCapacitacion = acc.capacitacionTotal - (limites.capacitacion * diasMultiplicador);
-            acc.diffCotizacion = acc.cotizacionTotal - (limites.cotizacion * diasMultiplicador);
-            acc.diffRetroCalidad = acc.retroCalidadTotal - (limites.retroCalidad * diasMultiplicador);
-            
-            acc.comidaEsperada = limites.comida * diasMultiplicador;
-            acc.banoEsperado = limites.bano * diasMultiplicador;
-            acc.retroEsperado = limites.retro * diasMultiplicador;
-            acc.capacitacionEsperada = limites.capacitacion * diasMultiplicador;
-            acc.cotizacionEsperada = limites.cotizacion * diasMultiplicador;
-            acc.retroCalidadEsperada = limites.retroCalidad * diasMultiplicador;
+            acc.diffComida = acc.comidaTotal - limComida;
+            acc.diffBano = acc.banoTotal - limBano;
+            acc.diffRetro = acc.retroTotal - limRetro;
+            acc.diffCapacitacion = acc.capacitacionTotal - limCap;
+            acc.diffCotizacion = acc.cotizacionTotal - limCot;
+            acc.diffRetroCalidad = acc.retroCalidadTotal - limRetroC;
+
+            acc.comidaEsperada = limComida;
+            acc.banoEsperado = limBano;
+            acc.retroEsperado = limRetro;
+            acc.capacitacionEsperada = limCap;
+            acc.cotizacionEsperada = limCot;
+            acc.retroCalidadEsperada = limRetroC;
             acc.despuesEsperado = despuesEsperado;
             acc.jornadaEsperada = jornadaEsperada;
-            acc.diasMultiplicador = diasMultiplicador;
+            acc.jornadaRealAjustada = jornadaRealAjustada;
+            acc.diasFalta = diasFalta;
+            acc.ausenciasJustificadas = ausenciasJustificadas;
+            acc.deudaTotalPausas = deudaTotalPausas;
+            acc.deudaComida = deudaComida;
+            acc.deudaBano = deudaBano;
+            acc.deudaRetro = deudaRetro;
+            acc.deudaCap = deudaCap;
+            acc.deudaCot = deudaCot;
+            acc.deudaRetroC = deudaRetroC;
             acc.tipo = tipo;
             resultados.push(acc);
         }
@@ -524,11 +862,11 @@
     function actualizarOpciones(periodo) {
         let valores = new Set();
         if (periodo === 'dia') {
-            datosGlobales.forEach(d => valores.add(d.Fecha));
+            datosGlobales.forEach(d => valores.add(d.Fecha.trim()));
         } else if (periodo === 'semana') {
-            datosGlobales.forEach(d => valores.add(getWeekNumber(new Date(d.Fecha))));
+            datosGlobales.forEach(d => valores.add(getWeekNumber(new Date(d.Fecha.trim()))));
         } else {
-            datosGlobales.forEach(d => valores.add(d.Fecha.substring(0,7)));
+            datosGlobales.forEach(d => valores.add(d.Fecha.trim().substring(0,7)));
         }
         let arr = Array.from(valores).sort();
         let sel = document.getElementById('valorSelect');
@@ -553,22 +891,25 @@
         let periodo = document.getElementById('periodoSelect').value;
         let valor = document.getElementById('valorSelect').value;
         let agenteFiltro = document.getElementById('agenteSelect').value;
+        
         if (!valor || !datosGlobales.length) return;
         
         let filtrados = procesarPeriodo(datosGlobales, periodo, valor);
         if (agenteFiltro !== "TODOS") {
             filtrados = filtrados.filter(d => d.Nombre.trim() === agenteFiltro);
         }
+
+        let diasDelPeriodo = getDiasEsperados(datosGlobales, periodo, valor);
+        let agentes = agruparPorAgente(filtrados, periodo, diasDelPeriodo);
         
-        let agentes = agruparPorAgente(filtrados, periodo);
         if (!agentes.length) { 
             document.getElementById('tablaResumenWrapper').innerHTML = '<div style="padding: 40px; text-align:center;">⚠️ Sin datos para el filtro seleccionado</div>'; 
             return;
         }
+        
         agentes.sort((a,b) => a.nombre.localeCompare(b.nombre));
         const labels = agentes.map(a => a.nombre);
         
-        // Grafico 1
         if (charts.tiempos) charts.tiempos.destroy();
         const ctxTiempos = document.getElementById('chartTiempos').getContext('2d');
         charts.tiempos = new Chart(ctxTiempos, {
@@ -581,7 +922,6 @@
             options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
         });
         
-        // Grafico 2 cumple
         if (charts.cumplimiento) charts.cumplimiento.destroy();
         const ctxCumplimiento = document.getElementById('chartCumplimiento').getContext('2d');
         charts.cumplimiento = new Chart(ctxCumplimiento, {
@@ -592,10 +932,9 @@
                 { label: 'Capacitación (min)', data: agentes.map(a=>a.diffCapacitacion), backgroundColor: '#2a9d8f' },
                 { label: 'Cotización (min)', data: agentes.map(a=>a.diffCotizacion), backgroundColor: '#e76f51' }
             ] }, 
-            options: { responsive: true }
+            options: { responsive: true, maintainAspectRatio: true }
         });
         
-        // Gráfico 3 excesos
         let excLabels=[], excComida=[], excBano=[], excCap=[], excCot=[];
         agentes.forEach(a=>{
             if(a.diffComida>0 || a.diffBano>0 || a.diffCapacitacion>0 || a.diffCotizacion>0){
@@ -606,9 +945,10 @@
                 excCot.push(a.diffCotizacion>0 ? a.diffCotizacion : 0);
             }
         });
+        
         if (charts.excesos) charts.excesos.destroy();
         const ctxExcesos = document.getElementById('chartExcesos').getContext('2d');
-        if(excLabels.length){
+        if(excLabels.length > 0){
             charts.excesos = new Chart(ctxExcesos, {
                 type: 'bar', 
                 data: { labels: excLabels, datasets: [
@@ -620,29 +960,53 @@
                 options: { responsive: true, maintainAspectRatio: true }
             });
         } else {
-            charts.excesos = new Chart(ctxExcesos, { type: 'bar', data: { labels: [], datasets: [] } });
-            ctxExcesos.fillStyle = '#2c7da0';
-            ctxExcesos.font = '14px sans-serif';
-            ctxExcesos.fillText('✅ No hay excesos de pausas en este periodo', 30, 80);
+            charts.excesos = new Chart(ctxExcesos, { 
+                type: 'bar', 
+                data: { labels: ['✅ Sin excesos'], datasets: [{ label: 'Excesos', data: [0], backgroundColor: '#2c7da0' }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
         }
         
-        // ========== TABLA COMPLETA OCUPANDO SECCIÓN GLOBAL ==========
         let periodoTexto = periodo === 'dia' ? 'Día' : (periodo === 'semana' ? 'Semana' : 'Mes');
         let fechaReferencia = valor;
-        document.getElementById('periodoInfoLabel').innerHTML = `📅 ${periodoTexto} · ${fechaReferencia} · ${agentes[0]?.diasMultiplicador || 1} día(s) laboral(es)`;
+        document.getElementById('periodoInfoLabel').innerHTML = `📅 ${periodoTexto} · ${fechaReferencia} · ${diasDelPeriodo.length} día(s) en periodo`;
         
         let html = `<table class="data-table">
             <thead>
-                <tr><th>Agente</th><th>Tipo</th><th>📞 Llamadas</th><th>⏱️ Jornada real / esperada</th><th>⌨️ Después llamada</th>
-                 <th>✅ Disponible</th><th>📞 En llamada</th><th>🍽️ Comida</th><th>🧻 Baño</th><th>📚 Capacitación</th><th>💰 Cotización</th><th>📝 Retro</th><th>🎯 Retro Calidad</th></tr>
+                <tr><th>Agente</th><th>Tipo</th><th>📞 Llamadas</th><th>⏱️ Jornada real / esperada</th><th>🔴 Deuda pausas</th><th>🚫 Ausencias</th><th>⌨️ Después llamada</th>
+                 <th>✅ Disponible</th><th>📞 En llamada</th><th>🍽️ Comida</th><th>🧻 Baño</th><th>📚 Capacitación</th><th>💰 Cotización</th>
+            </tr>
             </thead>
             <tbody>`;
+            
         agentes.forEach(a => {
             let tipoTexto = a.tipo === 'especial' ? '🟢 Medio tiempo' : '🔵 Tiempo completo';
             let tipoBadge = a.tipo === 'especial' ? 'badge-especial' : 'badge-normal';
             
             let jornadaClase = a.diffJornada >= 0 ? 'exceso-bueno' : 'falta-malo';
-            let jornadaDiffText = a.diffJornada > 0 ? `✅ +${(a.diffJornada/60).toFixed(1)}h` : (a.diffJornada < 0 ? `❌ ${(-a.diffJornada/60).toFixed(1)}h` : `✅ Exacto`);
+            let jornadaDiffText = a.diffJornada > 0 ? `✅ +${(a.diffJornada/60).toFixed(1)}h` : (a.diffJornada < 0 ? `❌ ${(a.diffJornada/60).toFixed(1)}h` : `✅ Exacto`);
+            
+            let deudaClase = a.deudaTotalPausas > 0 ? 'falta-malo' : 'ok-neutral';
+            let deudaTexto = a.deudaTotalPausas > 0 
+                ? `❌ ${a.deudaTotalPausas.toFixed(1)} min<br><small>${[
+                    a.deudaComida>0?`🍽️:${a.deudaComida.toFixed(1)}`:'',
+                    a.deudaBano>0?`🚽:${a.deudaBano.toFixed(1)}`:'',
+                    a.deudaCap>0?`📚:${a.deudaCap.toFixed(1)}`:'',
+                    a.deudaCot>0?`💰:${a.deudaCot.toFixed(1)}`:''
+                ].filter(Boolean).join(' · ')}</small>`
+                : `✅ Sin deuda`;
+
+            let faltasTexto = '';
+            if (a.diasFalta.length > 0) {
+                faltasTexto = `❌ ${a.diasFalta.length} falta(s)<br><small style="color:#b91c1c">${a.diasFalta.join(', ')}</small>`;
+            }
+            if (a.ausenciasJustificadas.length > 0) {
+                if (faltasTexto) faltasTexto += '<br>';
+                faltasTexto += `📋 ${a.ausenciasJustificadas.length} justificada(s)<br><small style="color:#e67e22">${a.ausenciasJustificadas.join(', ')}</small>`;
+            }
+            if (!faltasTexto) faltasTexto = '✅ Sin ausencias';
+            
+            let faltasClase = a.diasFalta.length > 0 ? 'falta-malo' : (a.ausenciasJustificadas.length > 0 ? 'ausencia-justificada' : 'ok-neutral');
             
             let despuesClase = a.diffDespues > 0 ? 'falta-malo' : (a.diffDespues < 0 ? 'exceso-bueno' : 'ok-neutral');
             let despuesTexto = a.diffDespues > 0 ? `❌ +${a.diffDespues.toFixed(1)}` : (a.diffDespues < 0 ? `✅ ${(-a.diffDespues).toFixed(1)}` : '✅ OK');
@@ -659,29 +1023,36 @@
             let cotClase = a.diffCotizacion > 0 ? 'falta-malo' : (a.diffCotizacion < 0 ? 'exceso-bueno' : 'ok-neutral');
             let cotTexto = a.diffCotizacion > 0 ? `❌ +${a.diffCotizacion.toFixed(1)}` : (a.diffCotizacion < 0 ? `✅ ${(-a.diffCotizacion).toFixed(1)}` : '✅ OK');
             
-            let retroClase = a.diffRetro > 0 ? 'falta-malo' : (a.diffRetro < 0 ? 'exceso-bueno' : 'ok-neutral');
-            let retroTexto = a.diffRetro > 0 ? `❌ +${a.diffRetro.toFixed(1)}` : (a.diffRetro < 0 ? `✅ ${(-a.diffRetro).toFixed(1)}` : '✅ OK');
-            
-            let retroCalClase = a.diffRetroCalidad > 0 ? 'falta-malo' : (a.diffRetroCalidad < 0 ? 'exceso-bueno' : 'ok-neutral');
-            let retroCalTexto = a.diffRetroCalidad > 0 ? `❌ +${a.diffRetroCalidad.toFixed(1)}` : (a.diffRetroCalidad < 0 ? `✅ ${(-a.diffRetroCalidad).toFixed(1)}` : '✅ OK');
-            
             html += `<tr>
                 <td style="font-weight:700; text-align:left;">${a.nombre}</td>
                 <td><span class="badge-tipo ${tipoBadge}">${tipoTexto}</span></td>
                 <td><strong>${a.llamadas}</strong></td>
-                <td class="${jornadaClase}"><span class="tiempo-numero">${(a.totalConexionMinutos/60).toFixed(1)}h / ${(a.jornadaEsperada/60).toFixed(0)}h</span><br><span class="diff-text">${jornadaDiffText}</span></td>
+                <td class="${jornadaClase}"><span class="tiempo-numero">${(a.jornadaRealAjustada/60).toFixed(1)}h / ${(a.jornadaEsperada/60).toFixed(0)}h</span><br><span class="diff-text">${jornadaDiffText}</span></td>
+                <td class="${deudaClase}">${deudaTexto}</td>
+                <td class="${faltasClase}">${faltasTexto}</td>
                 <td class="${despuesClase}"><small>esperado: ${a.despuesEsperado.toFixed(1)} min</small><br><strong>real: ${a.despues.toFixed(1)} min</strong><br><span class="diff-text">${despuesTexto}</span></td>
-                <td>${formatearTiempo(a.disponible)}</td><td>${formatearTiempo(a.enLlamada)}</td>
-                <td class="${comidaClase}"><small>lim: ${a.comidaEsperada}</small><br><strong>${a.comidaTotal.toFixed(1)}</strong><br>${comidaTexto}</td>
-                <td class="${banoClase}"><small>lim: ${a.banoEsperado}</small><br><strong>${a.banoTotal.toFixed(1)}</strong><br>${banoTexto}</td>
-                <td class="${capClase}"><small>lim: ${a.capacitacionEsperada}</small><br><strong>${a.capacitacionTotal.toFixed(1)}</strong><br>${capTexto}</td>
-                <td class="${cotClase}"><small>lim: ${a.cotizacionEsperada}</small><br><strong>${a.cotizacionTotal.toFixed(1)}</strong><br>${cotTexto}</td>
-                <td class="${retroClase}"><small>lim: ${a.retroEsperado}</small><br><strong>${a.retroTotal.toFixed(1)}</strong><br>${retroTexto}</td>
-                <td class="${retroCalClase}"><small>lim: ${a.retroCalidadEsperada}</small><br><strong>${a.retroCalidadTotal.toFixed(1)}</strong><br>${retroCalTexto}</td>
+                <td>${formatearTiempo(a.disponible)}</td>
+                <td>${formatearTiempo(a.enLlamada)}</td>
+                <td class="${comidaClase}"><small>lim: ${a.comidaEsperada.toFixed(0)}</small><br><strong>${a.comidaTotal.toFixed(1)}</strong><br>${comidaTexto}</td>
+                <td class="${banoClase}"><small>lim: ${a.banoEsperado.toFixed(0)}</small><br><strong>${a.banoTotal.toFixed(1)}</strong><br>${banoTexto}</td>
+                <td class="${capClase}"><small>lim: ${a.capacitacionEsperada.toFixed(0)}</small><br><strong>${a.capacitacionTotal.toFixed(1)}</strong><br>${capTexto}</td>
+                <td class="${cotClase}"><small>lim: ${a.cotizacionEsperada.toFixed(0)}</small><br><strong>${a.cotizacionTotal.toFixed(1)}</strong><br>${cotTexto}</td>
             </tr>`;
         });
         html += `</tbody></table>`;
         document.getElementById('tablaResumenWrapper').innerHTML = html;
+    }
+    
+    function cambiarTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        if (tab === 'admin') {
+            actualizarUIAdmin();
+        }
     }
     
     // Eventos
@@ -698,6 +1069,8 @@
     agenteSelect.addEventListener('change', renderDashboard);
     refreshBtn.addEventListener('click', renderDashboard);
     
+    // Inicializar
+    cargarConfiguracion();
     actualizarOpciones('dia');
     renderDashboard();
 </script>
