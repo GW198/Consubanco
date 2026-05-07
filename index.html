@@ -415,9 +415,8 @@
     }
     
     function formatearTiempo(minutos) {
-        if (minutos >= 60) return `${(minutos/60).toFixed(1)} h`;
-        return `${minutos.toFixed(1)} min`;
-    }
+    return `${minutos.toFixed(1)} min`;
+}
     
     function getWeekNumber(d) {
         const date = new Date(d.getTime());
@@ -635,9 +634,9 @@
         charts.tiempos = new Chart(ctxTiempos, {
             type: 'bar', 
             data: { labels, datasets: [
-                { label: 'Disponible (horas)', data: agentes.map(a=>a.disponible/60), backgroundColor: '#2c7da0', borderRadius: 8 },
-                { label: 'En llamada (horas)', data: agentes.map(a=>a.enLlamada/60), backgroundColor: '#61a5c2', borderRadius: 8 },
-                { label: 'Después llamada (horas)', data: agentes.map(a=>a.despues/60), backgroundColor: '#89c2d9', borderRadius: 8 }
+                { label: 'Disponible (minutos)', data: agentes.map(a=>a.disponible), backgroundColor: '#2c7da0', borderRadius: 8 },
+                { label: 'En llamada (minutos)', data: agentes.map(a=>a.enLlamada), backgroundColor: '#61a5c2', borderRadius: 8 },
+                { label: 'Después llamada (minutos)', data: agentes.map(a=>a.despues), backgroundColor: '#89c2d9', borderRadius: 8 }
             ] }, 
             options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
         });
